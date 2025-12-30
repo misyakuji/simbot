@@ -44,7 +44,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- 参照spring-boot-starter-parent的依赖版本-->
-        <spring.boot.version>3.1.0</spring.boot.version>
+        <spring.boot.version>4.0.0</spring.boot.version>
         <mysql.version>8.0.33</mysql.version>
         <mariadb.version>3.1.4</mariadb.version>
         <sqlite-jdbc.version>3.41.2.1</sqlite-jdbc.version>
