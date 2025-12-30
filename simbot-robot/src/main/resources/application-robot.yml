@@ -1,27 +1,22 @@
 simbot:
-  # 是否在bot注册完成后自动启动他们。
-  # 默认为 true
-  auto-start-bots: true
+  # simbot.application: 与 Application 相关的配置
+  application:
+    application-launch-mode: none
+  # simbot.bots: 与 bot 配置相关的属性。
+  bots:
+    auto-registration-failure-policy: ERROR
+    auto-registration-mismatch-configurable-bot-manager-policy: ERROR_LOG
+    auto-registration-resource-load-failure-policy: ERROR
+    auto-start-bots: true
+    auto-start-mode: ASYNC
+    configuration-json-resources:
+      - 'classpath:simbot-bots/*.bot.json'
+  # simbot.components: 组件相关的配置信息。
+  components:
+    auto-install-providers: true
+    auto-install-provider-configures: true
 
-  # 自定义配置bot资源文件的扫描路径。
-  # 默认为 'classpath:simbot-bots/*.bot*'
-  bot-configuration-resources:
-    - 'classpath:simbot-bots/*.bot*'
-
-  # 如果需要，此处配置扫描顶层函数形式的 Binder Factory。
-  # 默认不扫描
-  # top-level-binder-scan-package:
-  #   - 'example.binder.foo'
-  #   - 'example.binder.bar'
-
-  # 如果需要，此处配置扫描顶层函数形式的监听函数。
-  # 默认不扫描
-  # top-level-listener-scan-package:
-  #   - 'example.listener.foo'
-  #   - 'example.listener.bar'
-#  default-master-qq: 主人号码
-#  default-notice-groups: bot生效群组
-#  default-login-msg: bot上线消息内容
-  default-master-qq: 67252271
-  default-notice-groups: 710117186
-  default-login-msg: '您的小可爱已上线~'
+  # simbot.plugins: 插件相关的配置信息。
+  plugins:
+    auto-install-providers: true
+    auto-install-provider-configures: true

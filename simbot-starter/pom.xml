@@ -13,10 +13,10 @@
 
     <dependencies>
 
-<!--        <dependency>-->
-<!--            <groupId>com.miko</groupId>-->
-<!--            <artifactId>simbot-robot</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-robot</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.miko</groupId>

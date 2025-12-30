@@ -6,8 +6,8 @@ spring:
   application:
     name: simbot
   datasource:
-    username: root
-    password: awsl
+    username: simbot_user
+    password: simbot_pass
     url: jdbc:mysql://127.0.0.1:3306/simbot?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource            # 数据库连接池类别

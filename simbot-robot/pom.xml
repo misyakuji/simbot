@@ -13,7 +13,7 @@
     <artifactId>simbot-robot</artifactId>
 
     <properties>
-        <simbot.version>3.1.0</simbot.version>
+        <simbot.version>4.14.0</simbot.version>
     </properties>
 
     <dependencies>
@@ -21,17 +21,33 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-        <!--simbot-->
+
         <dependency>
-            <groupId>love.forte.simbot.boot</groupId>
-            <artifactId>simboot-core-spring-boot-starter</artifactId>
-            <!--<version>${simbot.version}</version>-->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!--mirai组件-->
+        <dependency>
+            <groupId>love.forte.simbot</groupId>
+            <artifactId>simbot-core-spring-boot-starter</artifactId>
+            <version>${simbot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>love.forte.simbot</groupId>
+            <artifactId>simbot-core-jvm</artifactId>
+            <version>${simbot.version}</version>
+        </dependency>
         <dependency>
             <groupId>love.forte.simbot.component</groupId>
-            <artifactId>simbot-component-mirai-core</artifactId>
+            <artifactId>simbot-component-onebot-v11-core-jvm</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.ktor/ktor-client-java-jvm -->
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-java-jvm</artifactId>
+            <version>2.3.12</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- httpclient用来请求自动回复API -->
@@ -60,7 +76,11 @@
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

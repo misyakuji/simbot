@@ -1,36 +1,8 @@
 {
-  "component": "simbot.mirai",
-  "code": QQ号,
-  "passwordInfo": {
-    "type": "md5_text",
-    "md5": "32位MD5密码"
-  },
-  "config": {
-    "workingDir": ".",
-    "heartbeatPeriodMillis": 60000,
-    "statHeartbeatPeriodMillis": 300000,
-    "heartbeatTimeoutMillis": 5000,
-    "heartbeatStrategy": "STAT_HB",
-    "reconnectionRetryTimes": 2147483647,
-    "autoReconnectOnForceOffline": false,
-    "protocol": "ANDROID_PAD",
-    "highwayUploadCoroutineCount": 16,
-    "deviceInfo": {
-      "type": "auto"
-    },
-    "noNetworkLog": false,
-    "noBotLog": false,
-    "isShowingVerboseEventLog": false,
-    "cacheDir": "cache",
-    "contactListCache": {
-      "saveIntervalMillis": 60000,
-      "friendListCacheEnabled": false,
-      "groupMemberListCacheEnabled": false
-    },
-    "loginCacheEnabled": true,
-    "convertLineSeparator": true,
-    "recallMessageCacheStrategyConfig": {
-      "type": "memory_lru"
-    }
+  "component": "simbot.onebot11",
+  "authorization": {
+    "botUniqueId": "759901093",
+    "apiServerHost": "http://localhost:3000",
+    "eventServerHost":"ws://localhost:3001"
   }
 }
