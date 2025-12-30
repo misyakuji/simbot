@@ -6,7 +6,7 @@
 <!--    <parent>-->
 <!--        <groupId>org.springframework.boot</groupId>-->
 <!--        <artifactId>spring-boot-starter-parent</artifactId>-->
-<!--        <version>3.1.0</version>-->
+<!--        <version>4.0.0</version>-->
 <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
 <!--    </parent>-->
 
@@ -30,10 +30,13 @@
         <druid.version>1.2.27</druid.version>
         <jsoup.version>1.21.2</jsoup.version>
         <httpclient.version>5.6</httpclient.version>
+        <okhttp.version>5.3.2</okhttp.version>
         <httputil.version>0.6.0</httputil.version>
         <fastjson.version>2.0.33</fastjson.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <simbot.version>4.14.0</simbot.version>
+        <onebot.version>1.8.2</onebot.version>
+        <ktor.version>2.3.12</ktor.version>
 
         <java.version>25</java.version>
         <maven.compiler.source>25</maven.compiler.source>
@@ -199,7 +202,7 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
-                <version>5.3.2</version>
+                <version>${okhttp.version}</version>
             </dependency>
 
 
@@ -222,13 +225,13 @@
             <dependency>
                 <groupId>love.forte.simbot.component</groupId>
                 <artifactId>simbot-component-onebot-v11-core-jvm</artifactId>
-                <version>1.8.2</version>
+                <version>${onebot.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/io.ktor/ktor-client-java-jvm -->
             <dependency>
                 <groupId>io.ktor</groupId>
                 <artifactId>ktor-client-java-jvm</artifactId>
-                <version>2.3.12</version>
+                <version>${ktor.version}</version>
                 <scope>runtime</scope>
             </dependency>
         </dependencies>
