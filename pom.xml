@@ -274,6 +274,14 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <!-- 添加Lombok注解处理器 -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>
