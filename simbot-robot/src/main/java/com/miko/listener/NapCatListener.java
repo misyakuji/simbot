@@ -91,6 +91,7 @@ public class NapCatListener {
         log.info("接收 <- 群聊 [{}({})] [{}({})] {}", groupNickname, groupId, groupMemberNickname, groupMemberId, msgfix);
         if (isReply.get()) {
             String reply = arkDoubaoService.streamChatWithDoubao(String.valueOf(msgfix));
+            event.replyAsync(reply);
             log.info("回复 -> 群聊 [{}({})] [{}({})] {}", groupNickname, groupId, botNickname, botId, reply);
         }
 
