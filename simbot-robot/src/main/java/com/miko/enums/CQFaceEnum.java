@@ -8,114 +8,114 @@ import love.forte.simbot.common.id.ID;
  */
 @Getter
 public enum CQFaceEnum {
-    // 以下是从JSON中提取并去重后的枚举项（按id升序排列，方便查阅）
-    FACE_0(0, null),
-    FACE_1(1, null),
-    FACE_2(2, null),
-    FACE_3(3, null),
-    FACE_4(4, null),
-    FACE_5(5, null),
-    FACE_6(6, null),
-    FACE_7(7, null),
-    FACE_8(8, null),
-    FACE_9(9, null),
-    FACE_10(10, null),
-    FACE_11(11, null),
-    FACE_12(12, null),
-    FACE_13(13, null),
-    FACE_14(14, null),
-    FACE_15(15, null),
-    FACE_18(18, null),
-    FACE_19(19, null),
-    FACE_20(20, null),
-    FACE_21(21, null),
-    FACE_22(22, null),
-    FACE_23(23, null),
-    FACE_24(24, null),
-    FACE_25(25, null),
-    FACE_26(26, null),
-    FACE_27(27, null),
-    FACE_28(28, null),
-    FACE_29(29, null),
-    FACE_30(30, null),
-    FACE_31(31, null),
-    FACE_32(32, null),
-    FACE_33(33, null),
-    FACE_34(34, null),
-    FACE_36(36, null),
-    FACE_37(37, null),
-    FACE_38(38, null),
-    FACE_39(39, null),
-    FACE_41(41, null),
-    FACE_42(42, null),
-    FACE_43(43, null),
-    FACE_46(46, null),
-    FACE_49(49, null),
-    FACE_53(53, null),
-    FACE_56(56, null),
-    FACE_59(59, null),
-    FACE_60(60, null),
-    FACE_63(63, null),
-    FACE_64(64, null),
-    FACE_66(66, null),
-    FACE_67(67, null),
-    FACE_74(74, null),
-    FACE_75(75, null),
-    FACE_76(76, null),
-    FACE_77(77, null),
-    FACE_78(78, null),
-    FACE_79(79, null),
-    FACE_85(85, null),
-    FACE_86(86, null),
-    FACE_89(89, null),
-    FACE_96(96, null),
-    FACE_97(97, null),
-    FACE_98(98, null),
-    FACE_99(99, null),
-    FACE_100(100, null),
-    FACE_101(101, null),
-    FACE_102(102, null),
-    FACE_103(103, null),
-    FACE_104(104, null),
-    FACE_105(105, null),
-    FACE_106(106, null),
-    FACE_107(107, null),
-    FACE_108(108, null),
-    FACE_109(109, null),
-    FACE_110(110, null),
-    FACE_111(111, null),
-    FACE_112(112, null),
-    FACE_114(114, null),
-    FACE_116(116, null),
-    FACE_118(118, null),
-    FACE_119(119, null),
-    FACE_120(120, null),
-    FACE_121(121, null),
-    FACE_123(123, null),
-    FACE_124(124, null),
-    FACE_125(125, null),
-    FACE_129(129, null),
-    FACE_137(137, null),
-    FACE_144(144, null),
-    FACE_146(146, null),
-    FACE_147(147, null),
-    FACE_169(169, null),
-    FACE_171(171, null),
-    FACE_172(172, null),
-    FACE_173(173, null),
-    FACE_174(174, null),
-    FACE_175(175, null),
-    FACE_176(176, null),
-    FACE_177(177, null),
-    FACE_178(178, null),
-    FACE_179(179, null),
-    FACE_181(181, null),
-    FACE_182(182, null),
-    FACE_183(183, null),
-    FACE_185(185, null),
-    FACE_187(187, null),
-    FACE_201(201, null),
-    FACE_212(212, null),
+    FACE_0(0, "惊讶"),
+    FACE_1(1, "撇嘴"),
+    FACE_2(2, "色"),
+    FACE_3(3, "发呆"),
+    FACE_4(4, "得意"),
+    FACE_5(5, "流泪"),
+    FACE_6(6, "害羞"),
+    FACE_7(7, "闭嘴"),
+    FACE_8(8, "睡"),
+    FACE_9(9, "大哭"),
+    FACE_10(10, "尴尬"),
+    FACE_11(11, "发怒"),
+    FACE_12(12, "调皮"),
+    FACE_13(13, "呲牙"),
+    FACE_14(14, "微笑"),
+    FACE_15(15, "难过"),
+    FACE_16(16, "酷"),
+    FACE_18(18, "酷"), // 新增：根据常见对应表，ID 18 常对应“酷”表情
+    FACE_19(19, "抓狂"), // 新增：常见对应
+    FACE_20(20, "呕吐"), // 新增：常见对应
+    FACE_21(21, "可爱"), // 新增
+    FACE_22(22, "可怜"), // 新增
+    FACE_23(23, "傲慢"), // 新增
+    FACE_24(24, "饥饿"), // 新增
+    FACE_25(25, "困"), // 新增
+    FACE_26(26, "惊恐"), // 新增
+    FACE_27(27, "流汗"), // 新增
+    FACE_28(28, "憨笑"), // 新增
+    FACE_29(29, "悠闲"), // 新增：常见对应“悠闲”或“大兵”
+    FACE_30(30, "奋斗"), // 新增
+    FACE_31(31, "咒骂"), // 新增
+    FACE_32(32, "疑问"), // 新增
+    FACE_33(33, "嘘"), // 新增
+    FACE_34(34, "晕"), // 新增
+    FACE_36(36, "衰"), // 新增
+    FACE_37(37, "骷髅"), // 新增
+    FACE_38(38, "敲打"), // 新增
+    FACE_39(39, "再见"), // 新增
+    FACE_41(41, "发抖"), // 新增
+    FACE_42(42, "爱情"), // 新增：或对应“爱心”
+    FACE_43(43, "跳跳"), // 新增
+    FACE_46(46, "猪头"), // 新增
+    FACE_49(49, "拥抱"), // 新增
+    FACE_53(53, "蛋糕"), // 新增
+    FACE_56(56, "礼物"), // 新增
+    FACE_59(59, "咖啡"), // 新增
+    FACE_60(60, "饭"), // 新增
+    FACE_63(63, "闪电"), // 新增
+    FACE_64(64, "炸弹"), // 新增
+    FACE_66(66, "爱心"), // 新增
+    FACE_67(67, "心碎"), // 新增
+    FACE_74(74, "太阳"), // 新增
+    FACE_75(75, "月亮"), // 新增
+    FACE_76(76, "赞"), // 新增
+    FACE_77(77, "踩"), // 新增
+    FACE_78(78, "握手"), // 新增
+    FACE_79(79, "胜利"), // 新增
+    FACE_85(85, "飞吻"), // 新增
+    FACE_86(86, "怄火"), // 新增
+    FACE_89(89, "西瓜"), // 新增
+    FACE_96(96, "冷汗"),
+    FACE_97(97, "擦汗"), // 新增
+    FACE_98(98, "抠鼻"), // 新增
+    FACE_99(99, "鼓掌"), // 新增
+    FACE_100(100, "糗大了"), // 新增
+    FACE_101(101, "坏笑"), // 新增
+    FACE_102(102, "左哼哼"), // 新增
+    FACE_103(103, "右哼哼"), // 新增
+    FACE_104(104, "哈欠"), // 新增
+    FACE_105(105, "鄙视"), // 新增
+    FACE_106(106, "委屈"), // 新增
+    FACE_107(107, "快哭了"), // 新增
+    FACE_108(108, "阴险"), // 新增
+    FACE_109(109, "亲亲"), // 新增
+    FACE_110(110, "吓"), // 新增
+    FACE_111(111, "可怜"), // 新增：可能与22重复，但ID不同
+    FACE_112(112, "菜刀"), // 新增
+    FACE_114(114, "啤酒"), // 新增
+    FACE_116(116, "篮球"), // 新增
+    FACE_118(118, "乒乓"), // 新增
+    FACE_119(119, "示爱"), // 新增
+    FACE_120(120, "瓢虫"), // 新增
+    FACE_121(121, "抱拳"), // 新增
+    FACE_123(123, "NO"), // 新增：即“不行”
+    FACE_124(124, "OK"), // 新增
+    FACE_125(125, "转圈"), // 新增
+    FACE_129(129, "挥手"), // 新增
+    FACE_137(137, "磕头"), // 新增
+    FACE_144(144, "鞭炮"), // 新增
+    FACE_146(146, "喝彩"), // 新增
+    FACE_147(147, "祈祷"), // 新增
+    FACE_169(169, "翻白眼"), // 新增
+    FACE_171(171, "灵机一动"), // 新增
+    FACE_172(172, "皱眉"), // 新增
+    FACE_173(173, "擦汗"), // 新增：可能与97重复
+    FACE_174(174, "偷笑"), // 新增
+    FACE_175(175, "无语"), // 新增
+    FACE_176(176, "翻白眼"), // 新增：可能与169重复
+    FACE_177(177, "嘿哈"), // 新增
+    FACE_178(178, "捂脸"), // 新增：与264“/捂脸”类似，但ID不同
+    FACE_179(179, "doge"), // 新增
+    FACE_181(181, "加油"), // 新增
+    FACE_182(182, "笑哭"), // 新增
+    FACE_183(183, "我最美"), // 新增
+    FACE_185(185, "托腮"), // 新增
+    FACE_187(187, "拍手"), // 新增
+    FACE_201(201, "点赞"), // 新增：虽然超出200，但在常见列表中
+    FACE_212(212, "拒绝"), // 新增
     FACE_262(262, "/脑阔疼"),
     FACE_263(263, "/沧桑"),
     FACE_264(264, "/捂脸"),
@@ -161,6 +161,7 @@ public enum CQFaceEnum {
     FACE_326(326, "/生气"),
     FACE_332(332, "/举牌牌"),
     FACE_333(333, "/烟花"),
+    FACE_334(334, "/虎虎生威"),
     FACE_336(336, "/豹富"),
     FACE_337(337, "/花朵脸"),
     FACE_338(338, "/我想开了"),
@@ -171,8 +172,9 @@ public enum CQFaceEnum {
     FACE_344(344, "/大怨种"),
     FACE_345(345, "/红包多多"),
     FACE_346(346, "/你真棒棒"),
+    FACE_347(347, "/大展宏兔"),
     FACE_349(349, "/坚强"),
-    FACE_350(350, null),
+    FACE_350(350, "/贴贴"),
     FACE_351(351, "/敲敲"),
     FACE_352(352, "/咦"),
     FACE_353(353, "/拜托"),
@@ -181,8 +183,8 @@ public enum CQFaceEnum {
     FACE_356(356, "/666"),
     FACE_357(357, "/裂开"),
     FACE_424(424, "/续标识"),
-    FACE_425(425, null),
-    FACE_426(426, null),
+    FACE_425(425, "/求放过"),
+    FACE_426(426, "/玩火"),
     FACE_427(427, "/偷感"),
     FACE_428(428, "/收到"),
     FACE_429(429, "/蛇年快乐"),
@@ -201,8 +203,7 @@ public enum CQFaceEnum {
      */
     CQFaceEnum(Integer faceId, String faceText) {
         this.faceId = faceId;
-        // 处理null值，补充默认名称
-        this.faceText = (faceText == null) ? "未知表情" : faceText;
+        this.faceText = faceText;
     }
 
     /**
