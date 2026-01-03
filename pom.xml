@@ -105,7 +105,7 @@
             <!-- spring-web -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
+                <artifactId>spring-boot-starter-webmvc</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
 
@@ -198,13 +198,13 @@
                 <artifactId>common-http-starter</artifactId>
                 <version>${httputil.version}</version>
             </dependency>
+
             <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.xerial</groupId>
