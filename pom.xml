@@ -30,7 +30,6 @@
         <druid.version>1.2.27</druid.version>
         <jsoup.version>1.21.2</jsoup.version>
         <httpclient.version>5.6</httpclient.version>
-        <okhttp.version>5.3.2</okhttp.version>
         <httputil.version>0.6.0</httputil.version>
         <fastjson.version>2.0.33</fastjson.version>
         <snakeyaml.version>2.0</snakeyaml.version>
@@ -49,6 +48,14 @@
         <mysql.version>9.5.0</mysql.version>
         <mariadb.version>3.5.7</mariadb.version>
         <sqlite-jdbc.version>3.51.1.0</sqlite-jdbc.version>
+
+        <!-- volcengine-java-sdk-ark-runtime -->
+        <volcengine-java-sdk-ark-runtime.version>1.0.3</volcengine-java-sdk-ark-runtime.version>
+        <jackson.version>2.12.7.1</jackson.version>
+        <retrofit.version>2.9.0</retrofit.version>
+        <rxjava2.version>2.0.0</rxjava2.version>
+        <okhttp3.version>3.14.9</okhttp3.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
     </properties>
 
     <dependencies>
@@ -203,7 +210,7 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
-                <version>${okhttp.version}</version>
+                <version>${okhttp3.version}</version>
             </dependency>
 
             <dependency>
@@ -246,13 +253,13 @@
             <dependency>
                 <groupId>com.volcengine</groupId>
                 <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
-                <version>1.0.3</version>
+                <version>${volcengine-java-sdk-ark-runtime.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.12.7.1</version>
+                <version>${jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
