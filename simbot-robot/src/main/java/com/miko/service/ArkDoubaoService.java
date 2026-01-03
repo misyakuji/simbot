@@ -9,11 +9,9 @@ import com.volcengine.ark.runtime.model.responses.response.ResponseObject;
 import com.volcengine.ark.runtime.service.ArkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -91,7 +89,7 @@ public class ArkDoubaoService {
         arkService.streamChatCompletion(streamChatCompletionRequest)
                 .doOnError(e -> log.error("流式调用出现异常", e)) // 规范日志记录,而非仅打印堆栈
                 .filter(choice -> choice.getChoices() != null && !choice.getChoices().isEmpty()) // 过滤无效分片
-                .map(choice -> choice.getChoices().get(0).getMessage().getContent().toString()) // 提取分片内容
+                .map(choice -> choice.getChoices().getFirst().getMessage().getContent().toString()) // 提取分片内容
                 .filter(content -> content != null && !content.trim().isEmpty()) // 过滤空内容
                 .blockingForEach(sb::append);
         log.info("豆包API调用成功,响应结果:{}", sb);
