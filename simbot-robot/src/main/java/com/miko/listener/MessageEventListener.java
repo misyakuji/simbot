@@ -8,9 +8,10 @@ import love.forte.simbot.common.id.ID;
 import love.forte.simbot.common.id.Identifies;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotFriendMessageEvent;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotGroupMessageEvent;
+import love.forte.simbot.component.onebot.v11.core.event.message.OneBotMessageEvent;
 import love.forte.simbot.component.onebot.v11.message.segment.*;
-import love.forte.simbot.event.Event;
-import love.forte.simbot.event.MessageEvent;
+import love.forte.simbot.quantcat.common.annotations.ContentTrim;
+import love.forte.simbot.quantcat.common.annotations.Filter;
 import love.forte.simbot.quantcat.common.annotations.Listener;
 
 import org.springframework.stereotype.Component;
@@ -20,26 +21,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component
-public class NapCatListener {
+public class MessageEventListener {
 
     private final ArkDoubaoService arkDoubaoService;
 
-    public NapCatListener(ArkDoubaoService arkDoubaoService) {
+    public MessageEventListener(ArkDoubaoService arkDoubaoService) {
         this.arkDoubaoService = arkDoubaoService;
     }
 
     @Listener
-    public void handle(Event event) {
-        log.info("{}", event);
+    public void msgEvent(OneBotMessageEvent event) {
+        log.debug("msgEvent: {}", event);
     }
 
     @Listener
-    public void msgEvent(MessageEvent event) {
-        log.info("msgEvent: {}", event);
-
-    }
-
-    @Listener
+    @ContentTrim
+//    @Filter("你好")
     public void groupMsgEvent(OneBotGroupMessageEvent event) {
 
         // 群昵称
@@ -92,12 +89,18 @@ public class NapCatListener {
         if (isReply.get()) {
             String reply = arkDoubaoService.streamChatWithDoubao(String.valueOf(msgfix));
             event.replyAsync(reply);
+//            event.getContent().sendAsync(reply);
             log.info("回复 -> 群聊 [{}({})] [{}({})] {}", groupNickname, groupId, botNickname, botId, reply);
         }
 
 
     }
 
+//    @Listener
+//    @Filter("cmd")
+//    public void friendMsgCmdEvent(OneBotFriendMessageEvent event) throws InterruptedException {
+//        event.getContent().sendAsync("执行命令:"+ event.getSourceEvent().getMessage().getFirst());
+//    }
     @Listener
     public void friendMsgEvent(OneBotFriendMessageEvent event) {
         // 好友ID
@@ -125,9 +128,10 @@ public class NapCatListener {
         if (Objects.equals(String.valueOf(msgfix), "获取模型列表")) {
             value = arkDoubaoService.getModelList().toString();
         } else {
-            value = arkDoubaoService.streamChatWithDoubao(String.valueOf(msgfix));
+            value = "arkDoubaoService.streamChatWithDoubao(String.valueOf(msgfix))";
         }
         log.info("发送 -> {} - {}", event.getId(),value);
         event.replyAsync(value);
+        //event.getContent().sendAsync(value);
     }
 }
