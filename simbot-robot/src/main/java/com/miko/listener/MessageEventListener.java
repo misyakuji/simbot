@@ -128,7 +128,7 @@ public class MessageEventListener {
         if (Objects.equals(String.valueOf(msgfix), "获取模型列表")) {
             value = arkDoubaoService.getModelList().toString();
         } else {
-            value = "arkDoubaoService.streamChatWithDoubao(String.valueOf(msgfix))";
+            value = arkDoubaoService.streamChatWithDoubao(String.valueOf(msgfix));
         }
         log.info("发送 -> {} - {}", event.getId(),value);
         event.replyAsync(value);
