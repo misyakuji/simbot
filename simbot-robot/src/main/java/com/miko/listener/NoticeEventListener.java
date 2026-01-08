@@ -8,6 +8,8 @@ import love.forte.simbot.component.onebot.v11.core.event.notice.*;
 import love.forte.simbot.quantcat.common.annotations.Listener;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Slf4j
 @Component
 public class NoticeEventListener {
@@ -90,10 +92,12 @@ public class NoticeEventListener {
         if (event.getSourceEvent().getNoticeType().equals("notify")) {
             if (event.getGroupId() == null) {
                 log.info("好友戳一戳事件{}", event);
-                event.getBot().executeAsync(SendPrivateMsgApi.create(event.getUserId(), OneBotMessageOutgoing.create("不許戳我！")));
+                event.getBot().executeAsync(SendPrivateMsgApi.create(event.getUserId(), OneBotMessageOutgoing.create("不許戳我啦！")));
             } else {
                 log.info("群戳一戳事件{}", event);
-                event.getBot().executeAsync(SendGroupMsgApi.create(event.getGroupId(), OneBotMessageOutgoing.create("不許戳我！")));
+                if (Objects.equals(event.getSourceEvent().getTargetId(), event.getSourceEvent().getSelfId())) {
+                    event.getBot().executeAsync(SendGroupMsgApi.create(event.getGroupId(), OneBotMessageOutgoing.create("不許戳我！")));
+                }
             }
         }
     }
