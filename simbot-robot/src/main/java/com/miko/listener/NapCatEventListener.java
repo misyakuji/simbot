@@ -29,7 +29,7 @@ public class NapCatEventListener {
         ID groupId = Identifies.of(710117186);
         log.info("Bot[{}:{}]启动成功~", event.getBot().getName(), event.getBot().getId());
         event.getBot().executeAsync(SendPrivateMsgApi.create(masterId,OneBotMessageOutgoing.create("本宝闪亮登场~")));
-        event.getBot().executeAsync(SendGroupMsgApi.create(groupId,OneBotMessageOutgoing.create("本宝闪亮登场~")));
+        // event.getBot().executeAsync(SendGroupMsgApi.create(groupId,OneBotMessageOutgoing.create("本宝闪亮登场~")));
     }
 
     @Listener
