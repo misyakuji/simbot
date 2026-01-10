@@ -1,4 +1,4 @@
-package com.miko.utils;
+package com.miko.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -83,9 +83,6 @@ public class JsonUtils {
         }
         try {
             return OBJECT_MAPPER.readValue(json, clazz);
-        } catch (JsonProcessingException e) {
-            log.error("JSON反序列化失败: {}, JSON: {}", e.getMessage(), json, e);
-            throw new RuntimeException("JSON反序列化失败: " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("JSON反序列化失败: {}, JSON: {}", e.getMessage(), json, e);
             throw new RuntimeException("JSON反序列化失败: " + e.getMessage(), e);
@@ -106,9 +103,6 @@ public class JsonUtils {
         }
         try {
             return OBJECT_MAPPER.readValue(json, typeReference);
-        } catch (JsonProcessingException e) {
-            log.error("JSON反序列化失败: {}, JSON: {}", e.getMessage(), json, e);
-            throw new RuntimeException("JSON反序列化失败: " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("JSON反序列化失败: {}, JSON: {}", e.getMessage(), json, e);
             throw new RuntimeException("JSON反序列化失败: " + e.getMessage(), e);

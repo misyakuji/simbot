@@ -2,7 +2,7 @@ package com.miko.service;
 
 import com.miko.entity.napcat.enums.NapCatApiEnum;
 import com.miko.exception.ApiException;
-import com.miko.utils.JsonUtils;
+import com.miko.util.JsonUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
