@@ -1,10 +1,7 @@
 package com.miko.entity.napcat.enums;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * 用户状态枚举
@@ -16,6 +13,7 @@ import lombok.NoArgsConstructor;
  * @author misyakuji
  * @since 2026-01-10
  */
+@Getter
 public enum UserStatusEnum {
 
     /**
@@ -529,24 +527,6 @@ public enum UserStatusEnum {
     UserStatusEnum(String name, StatusData data) {
         this.name = name;
         this.data = data;
-    }
-
-    /**
-     * 获取状态名称
-     *
-     * @return 状态名称
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * 获取状态数据
-     *
-     * @return 状态数据
-     */
-    public StatusData getData() {
-        return data;
     }
 
     /**
