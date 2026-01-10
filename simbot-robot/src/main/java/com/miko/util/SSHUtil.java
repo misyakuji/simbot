@@ -1,5 +1,4 @@
 package com.miko.util;
-
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -15,54 +14,60 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * SSH连接工具类（带认证调试）
+ * SSH连接工具类（改用Shell通道，保持命令上下文）
+ * 封装SSH连接、命令执行、资源释放等核心逻辑
  */
 @Slf4j
 public class SSHUtil implements AutoCloseable {
-    // 核心配置
+    // 默认SSH端口
     private static final int DEFAULT_SSH_PORT = 22;
-    private static final int DEFAULT_CONNECT_TIMEOUT = 30000;
-    private static final int DEFAULT_COMMAND_TIMEOUT = 15000;
+    // 连接超时时间（15秒）
+    private static final int DEFAULT_CONNECT_TIMEOUT = 15000;
+    // 命令执行超时时间（毫秒）
+    private static final int DEFAULT_COMMAND_TIMEOUT = 5000;
+    // 默认空闲超时时间（秒）- 无操作超过此时间自动关闭连接
     public static final int DEFAULT_IDLE_TIMEOUT_SECONDS = 300;
+    // 空闲检测线程池周期（秒）
     private static final int IDLE_CHECK_PERIOD_SECONDS = 10;
-    private static final int DEFAULT_CONNECT_RETRY_TIMES = 3;
-    private static final int CONNECT_RETRY_INTERVAL = 2000;
+    // 连接重试次数
+    private static final int DEFAULT_CONNECT_RETRY_TIMES = 2;
+    // 连接重试间隔（毫秒）
+    private static final int CONNECT_RETRY_INTERVAL = 1000;
 
-    // 全局线程池
+    // 全局空闲检测线程池
     private static final ScheduledExecutorService IDLE_CHECK_EXECUTOR = Executors.newSingleThreadScheduledExecutor(runnable -> {
         Thread thread = new Thread(runnable, "ssh-idle-check-thread");
         thread.setDaemon(true);
         return thread;
     });
 
-    // 连接参数
+    // SSH连接核心参数
     private String host;
     private int port;
     private String username;
     private String password;
     private String privateKeyPath;
 
-    // 配置参数
+    // 超时/重试配置
     private int idleTimeoutSeconds;
     private int connectTimeout;
     private int connectRetryTimes;
 
-    // 状态变量
+    // 空闲超时变量
     private final AtomicLong lastOperateTime = new AtomicLong(System.currentTimeMillis());
     private volatile boolean idleCheckScheduled = false;
-    private volatile boolean isConnected = false;
 
-    // Shell通道核心对象
+    // Shell通道相关（核心：保持会话上下文）
     private JSch jsch;
     private Session session;
     private ChannelShell channelShell;
-    private OutputStream shellOutput;
-    private InputStream shellInput;
+    private OutputStream shellOutput; // 向shell写入命令
+    private InputStream shellInput;   // 从shell读取结果
     private BufferedReader shellReader;
 
-    // 路径信息
-    private String currentPath = "~";
-    private String homeDir = "~";
+    // 路径相关
+    private String currentPath;
+    private String homeDir;
 
     /**
      * 私有构造方法
@@ -78,14 +83,12 @@ public class SSHUtil implements AutoCloseable {
         this.connectTimeout = connectTimeout;
         this.connectRetryTimes = connectRetryTimes;
         this.jsch = new JSch();
-
-        // 新增：打印认证信息（调试用）
-        log.debug("SSH认证信息 - 主机：{}:{}，用户名：{}，密码长度：{}",
-                host, port, username, password == null ? 0 : password.length());
+        this.currentPath = "~";
+        this.homeDir = "~";
     }
 
     /**
-     * 静态工厂方法：密码登录（默认端口）
+     * 静态工厂方法：密码登录
      */
     public static SSHUtil createWithPassword(String host, String username, String password) {
         return new SSHUtil(host, DEFAULT_SSH_PORT, username, password, null,
@@ -101,188 +104,96 @@ public class SSHUtil implements AutoCloseable {
     }
 
     /**
-     * 建立SSH连接
+     * 建立SSH连接（创建Shell通道）
      */
-    public boolean connect() throws JSchException, IOException, InterruptedException {
+    public void connect() throws JSchException, IOException {
         int retryCount = 0;
         JSchException lastException = null;
 
         while (retryCount <= connectRetryTimes) {
             try {
-                log.info("========================================");
-                log.info("开始连接SSH服务器");
-                log.info("========================================");
-                log.info("主机：{}:{}，用户名：{}", host, port, username);
-                log.info("重试次数：{}/{}，超时：{}ms", retryCount + 1, connectRetryTimes + 1, connectTimeout);
-
-                // 1. 创建Session
-                log.debug("步骤1：创建Session...");
+                // 创建Session
                 session = jsch.getSession(username, host, port);
-                session.setPassword(password);
-                log.debug("Session创建成功");
+                log.info("开始连接SSH服务器：{}:{}，用户名：{}（第{}次尝试）",
+                        host, port, username, retryCount + 1);
 
-                // 2. Session配置（简化配置，避免兼容性问题）
-                log.debug("步骤2：配置Session参数...");
+                // 配置认证
+                if (privateKeyPath != null && !privateKeyPath.isEmpty()) {
+                    jsch.addIdentity(privateKeyPath);
+                    log.debug("使用私钥登录");
+                } else {
+                    session.setPassword(password);
+                    log.debug("使用密码登录");
+                }
+
+                // Session配置
                 Properties config = new Properties();
                 config.put("StrictHostKeyChecking", "no");
+                config.put("PreferredAuthentications", "publickey,keyboard-interactive,password");
+                config.put("ConnectTimeout", String.valueOf(connectTimeout));
+                config.put("compression.s2c", "none");
+                config.put("compression.c2s", "none");
                 session.setConfig(config);
                 session.setTimeout(connectTimeout);
-                log.debug("Session配置完成");
+                session.connect();
 
-                // 3. 连接Session
-                log.info("步骤3：正在建立SSH连接（认证）...");
-                long connectStart = System.currentTimeMillis();
-                session.connect(connectTimeout);
-                long connectTime = System.currentTimeMillis() - connectStart;
-                log.info("✓ SSH Session连接成功！认证通过，耗时：{}ms", connectTime);
+                // 核心：创建Shell通道（保持会话上下文）
+                channelShell = (ChannelShell) session.openChannel("shell");
+                // 配置Shell通道
+                channelShell.setPty(true); // 启用伪终端，模拟真实终端
+                channelShell.setPtyType("vt100"); // 终端类型
+                // 启用输入输出流
+                shellOutput = channelShell.getOutputStream();
+                shellInput = channelShell.getInputStream();
+                shellReader = new BufferedReader(new InputStreamReader(shellInput, StandardCharsets.UTF_8));
+                // 连接Shell通道
+                channelShell.connect();
 
-                // 4. 创建Shell通道
-                log.info("步骤4：正在创建Shell通道...");
-                createShellChannel();
-                log.info("✓ Shell通道创建成功");
+                log.info("SSH服务器连接成功，Shell通道已创建：{}:{}", host, port);
 
-                // 5. 初始化路径（同步执行，避免时序问题）
-                log.info("步骤5：正在初始化路径信息...");
+                // 初始化家目录和当前路径（仅一次）
                 initPathInfo();
-                log.info("✓ 路径初始化完成，当前路径：{}", currentPath);
-
-                // 6. 标记连接成功
-                isConnected = true;
-                log.info("========================================");
-                log.info("✓ SSH连接成功！{}:{} 已就绪", host, port);
-                log.info("========================================");
-
-                // 7. 启动空闲检测
+                // 更新操作时间+启动空闲检测
                 updateLastOperateTime();
                 scheduleIdleCheckTask();
-                return true;
+                return;
 
             } catch (JSchException e) {
                 lastException = e;
                 retryCount++;
-
-                log.error("========================================");
-                log.error("✗ 第{}次连接失败", retryCount);
-                log.error("========================================");
-                log.error("错误类型：{}", e.getClass().getName());
-                log.error("错误信息：{}", e.getMessage());
-
-                Throwable cause = e.getCause();
-                if (cause != null) {
-                    log.error("根本原因：{}", cause.getMessage());
-                }
-
-                log.error("异常堆栈：");
-                for (StackTraceElement element : e.getStackTrace()) {
-                    log.error("  at {}", element);
-                }
-
-                cleanUp();
-
+                log.warn("第{}次连接失败：{}", retryCount, e.getMessage());
                 if (retryCount <= connectRetryTimes) {
-                    log.info("等待 {}ms 后进行第 {} 次重试...", CONNECT_RETRY_INTERVAL, retryCount + 1);
                     try {
                         Thread.sleep(CONNECT_RETRY_INTERVAL);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        throw new InterruptedException("连接重试被中断");
+                        throw new JSchException("连接重试被中断", ie);
                     }
                 }
             }
         }
 
-        log.error("========================================");
-        log.error("✗ 所有重试均失败，无法连接到 {}:{}",
-                host, port);
-        log.error("========================================");
         throw new JSchException(String.format("连接SSH服务器%s:%d失败（重试%d次）",
                 host, port, connectRetryTimes), lastException);
     }
 
     /**
-     * 创建Shell通道（简化版）
+     * 初始化家目录和当前路径
      */
-    private void createShellChannel() throws JSchException, IOException, InterruptedException {
-        log.debug("  - 打开shell通道...");
-        channelShell = (ChannelShell) session.openChannel("shell");
-
-        // 不使用PTY，避免兼容性问题
-        // channelShell.setPty(true);
-        // channelShell.setPtyType("vt100");
-        log.debug("  - Shell通道已打开（禁用PTY以提高兼容性）");
-
-        // 获取流
-        log.debug("  - 获取输入输出流...");
-        shellOutput = channelShell.getOutputStream();
-        shellInput = channelShell.getInputStream();
-        shellReader = new BufferedReader(new InputStreamReader(shellInput, StandardCharsets.UTF_8));
-        log.debug("  - 流已获取");
-
-        // 连接通道 - 使用较短的超时
-        log.debug("  - 正在连接Shell通道（超时：{}ms）...", 5000);
-        long channelStart = System.currentTimeMillis();
-        channelShell.connect(5000); // 5秒超时
-        long channelTime = System.currentTimeMillis() - channelStart;
-        log.debug("  - Shell通道连接成功，耗时：{}ms", channelTime);
-
-        // 清空初始输出（同步执行）
-        log.debug("  - 清空初始输出...");
-        clearInitialOutput();
-        log.debug("  - 初始输出已清空");
+    private void initPathInfo() throws IOException {
+        // 获取家目录
+        String homeResult = executeCommand("echo $HOME", true);
+        this.homeDir = homeResult.trim().isEmpty() ? "~" : homeResult.trim();
+        // 获取初始当前路径
+        updateCurrentPath();
+        log.debug("初始化路径信息 - 家目录：{}，当前路径：{}", homeDir, currentPath);
     }
 
     /**
-     * 清空初始输出（同步）
+     * 更新当前路径（执行pwd命令）
      */
-    private void clearInitialOutput() throws InterruptedException, IOException {
-        log.debug("清空Shell初始输出...");
-        long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < 3000) {
-            if (shellReader.ready()) {
-                String line = shellReader.readLine();
-                if (line == null) break;
-                log.debug("初始输出：{}", line);
-            } else {
-                Thread.sleep(100);
-            }
-        }
-        log.debug("初始输出清空完成");
-    }
-
-    /**
-     * 初始化路径信息（同步）
-     */
-    private void initPathInfo() throws IOException, InterruptedException {
-        try {
-            // 检查连接状态
-            if (!isConnected || session == null || !session.isConnected()) {
-                throw new IOException("SSH会话未建立，无法初始化路径");
-            }
-
-            // 获取家目录
-            String homeResult = executeCommandInternal("echo $HOME");
-            this.homeDir = homeResult.trim().isEmpty() ? "~" : homeResult.trim();
-            log.debug("家目录：{}", homeDir);
-
-            // 获取初始路径
-            String pwdResult = executeCommandInternal("pwd");
-            updateCurrentPath(pwdResult);
-            log.debug("路径初始化完成 - 当前路径：{}", currentPath);
-        } catch (Exception e) {
-            log.error("路径初始化失败：{}，连接状态：{}，Session状态：{}",
-                    e.getMessage(),
-                    isConnected,
-                    session != null ? session.isConnected() : "null");
-            this.homeDir = "~";
-            this.currentPath = "~";
-            throw e; // 抛出异常，让调用方知道初始化失败
-        }
-    }
-
-    /**
-     * 更新当前路径
-     */
-    private void updateCurrentPath(String pwdResult) {
+    private void updateCurrentPath() throws IOException {
+        String pwdResult = executeCommand("pwd", true);
         String realPath = pwdResult.trim().isEmpty() ? homeDir : pwdResult.trim();
         // 替换家目录为~
         if (realPath.startsWith(homeDir) && !realPath.equals(homeDir)) {
@@ -295,135 +206,94 @@ public class SSHUtil implements AutoCloseable {
     }
 
     /**
-     * 执行内部命令（极简版）
+     * 执行单个命令（核心：Shell通道执行，保持上下文）
+     * @param command 要执行的命令
      */
-    private String executeCommandInternal(String command) throws IOException, InterruptedException {
-        if (!isConnected) {
-            throw new IOException("SSH未连接");
-        }
-
-        StringBuilder result = new StringBuilder();
-
-        // 写入命令
-        shellOutput.write((command + "\n").getBytes(StandardCharsets.UTF_8));
-        shellOutput.flush();
-        Thread.sleep(200); // 等待命令执行
-
-        // 读取输出（不过滤，保留所有内容）
-        long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < DEFAULT_COMMAND_TIMEOUT) {
-            while (shellReader.ready()) {
-                String line = shellReader.readLine();
-                if (line == null) break;
-
-                // 只过滤命令回显的第一行（命令本身）
-                if (!line.trim().equals(command)) {
-                    result.append(line).append("\n");
-                }
-            }
-
-            // 简单判断：如果有输出且短时间内没有新输出，认为执行完成
-            if (result.length() > 0 && !shellReader.ready()) {
-                Thread.sleep(100);
-                if (!shellReader.ready()) {
-                    break;
-                }
-            } else {
-                Thread.sleep(100);
-            }
-        }
-
-        String output = result.toString().trim();
-        log.debug("内部命令[{}]输出：{}", command, output);
-        return output;
+    public String executeCommand(String command) throws IOException {
+        return executeCommand(command, false);
     }
 
     /**
-     * 执行单个命令（对外暴露）
+     * 重载：执行单个命令（区分内部/外部命令）
      */
-    public String executeCommand(String command) throws IOException, InterruptedException {
-        if (!isConnected) {
-            throw new IOException("SSH连接未建立");
+    private String executeCommand(String command, boolean isInternal) throws IOException {
+        if (session == null || !session.isConnected() || channelShell == null || !channelShell.isConnected()) {
+            throw new IOException("SSH连接或Shell通道未建立");
         }
 
-        updateLastOperateTime();
-        log.info("执行命令：{}", command);
+        if (!isInternal) {
+            updateLastOperateTime();
+            log.info("开始执行SSH命令：{}", command);
+        }
 
         StringBuilder result = new StringBuilder();
-
         try {
-            // 写入命令
+            // 向Shell通道写入命令（加换行符模拟回车执行）
             shellOutput.write((command + "\n").getBytes(StandardCharsets.UTF_8));
             shellOutput.flush();
-            Thread.sleep(300); // 等待命令执行
 
-            // 读取输出（核心修复：保留所有有效输出）
+            // 等待命令执行完成（简单的超时控制）
             long startTime = System.currentTimeMillis();
-            boolean hasOutput = false;
-
+            String line;
+            // 读取输出，直到出现提示符（表示命令执行完成）
             while ((System.currentTimeMillis() - startTime) < DEFAULT_COMMAND_TIMEOUT) {
-                while (shellReader.ready()) {
-                    hasOutput = true;
-                    String line = shellReader.readLine();
+                if (shellReader.ready()) {
+                    line = shellReader.readLine();
                     if (line == null) break;
 
-                    // 过滤条件：只过滤空行和纯命令回显
-                    if (!line.isEmpty() && !line.trim().equals(command)) {
-                        // 进一步过滤提示符行（适配Termux）
-                        if (!(line.contains(username + "@") && (line.endsWith("$") || line.endsWith("#")))) {
-                            result.append(line).append("\n");
+                    // 过滤掉命令回显和提示符（仅保留执行结果）
+                    if (!isInternal) {
+                        // 过滤掉命令本身的回显（如输入cd test后，shell会回显cd test）
+                        if (!line.trim().equals(command) &&
+                                !line.trim().startsWith(username + "@") && // 过滤提示符
+                                !line.isEmpty()) { // 过滤空行
+                            result.append(line).append(System.lineSeparator());
                         }
-                    }
-                }
-
-                // 退出条件：有输出且无新内容
-                if (hasOutput && !shellReader.ready()) {
-                    Thread.sleep(200);
-                    if (!shellReader.ready()) {
-                        break;
+                    } else {
+                        // 内部命令直接保留结果（如pwd的输出）
+                        result.append(line);
                     }
                 } else {
                     Thread.sleep(100);
                 }
             }
 
-            // 更新路径（只对cd命令生效）
-            if (command.trim().startsWith("cd ")) {
-                try {
-                    String pwdResult = executeCommandInternal("pwd");
-                    updateCurrentPath(pwdResult);
-                } catch (Exception e) {
-                    log.warn("更新cd命令路径失败", e);
-                }
+            // 非内部命令：更新路径 + 记录日志
+            if (!isInternal) {
+                updateCurrentPath(); // 实时更新路径
+                log.info("命令执行完成：{}，当前路径：{}", command, currentPath);
             }
-
-            String cmdResult = result.toString().trim();
-            log.info("命令执行完成：{}，结果：{}", command, cmdResult.isEmpty() ? "(空)" : cmdResult);
-            return cmdResult;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new InterruptedException("命令执行被中断：" + command);
+            throw new IOException("命令执行被中断：" + command, e);
         }
+
+        String cmdResult = result.toString().trim();
+        if (!isInternal) {
+            log.debug("命令执行结果：{}", cmdResult);
+        }
+        return cmdResult;
     }
 
     /**
      * 执行多条命令（带提示符输出）
      */
-    public String executeCommands(String... commands) throws IOException, InterruptedException {
+    public String executeCommands(String... commands) throws IOException {
         updateLastOperateTime();
-        log.info("执行多条命令，共{}条", commands.length);
-
+        log.info("开始执行多条SSH命令，共{}条", commands.length);
         StringBuilder allResults = new StringBuilder();
+
         for (String cmd : commands) {
-            // 生成本地提示符
-            String prompt = getLocalPrompt();
+            // 生成实时提示符
+            String prompt = getRealPrompt();
             // 拼接提示符+命令
-            allResults.append(prompt).append(" ").append(cmd).append("\n");
-            // 执行命令
-            String result = executeCommand(cmd);
-            // 拼接结果
-            allResults.append(result).append("\n\n");
+            allResults.append(prompt).append(" ").append(cmd)
+                    .append(System.lineSeparator());
+            // 执行命令并获取结果
+            String cmdResult = executeCommand(cmd);
+            allResults.append(cmdResult)
+                    .append(System.lineSeparator()).append(System.lineSeparator());
         }
 
         log.info("多条命令执行完成");
@@ -431,11 +301,15 @@ public class SSHUtil implements AutoCloseable {
     }
 
     /**
-     * 生成本地提示符
+     * 生成实时提示符
      */
-    private String getLocalPrompt() {
+    private String getRealPrompt() {
         String symbol = "root".equals(this.username) ? "#" : "$";
-        return String.format("%s@%s:%s%s", username, host, currentPath, symbol);
+        return String.format("%s@%s:%s%s",
+                this.username,
+                this.host,
+                this.currentPath,
+                symbol);
     }
 
     /**
@@ -446,29 +320,29 @@ public class SSHUtil implements AutoCloseable {
     }
 
     /**
-     * 启动空闲检测
+     * 启动空闲检测任务
      */
     private void scheduleIdleCheckTask() {
         if (idleCheckScheduled) return;
 
         IDLE_CHECK_EXECUTOR.scheduleAtFixedRate(() -> {
             try {
-                if (!isConnected) {
+                if (session == null || !session.isConnected()) {
                     idleCheckScheduled = false;
                     return;
                 }
 
                 long idleTime = System.currentTimeMillis() - lastOperateTime.get();
-                long idleSeconds = idleTime / 1000;
+                long idleTimeSeconds = idleTime / 1000;
 
-                if (idleSeconds >= idleTimeoutSeconds) {
-                    log.warn("SSH连接空闲超时（{}秒），自动关闭", idleSeconds);
+                log.debug("SSH连接空闲时间：{}秒（阈值：{}秒）", idleTimeSeconds, idleTimeoutSeconds);
+
+                if (idleTimeSeconds >= idleTimeoutSeconds) {
+                    log.warn("SSH连接空闲超时，自动关闭：{}:{}", host, port);
                     disconnect();
-                } else {
-                    log.debug("SSH连接空闲时间：{}秒", idleSeconds);
                 }
             } catch (Exception e) {
-                log.error("空闲检测异常", e);
+                log.error("空闲检测任务执行异常", e);
             }
         }, IDLE_CHECK_PERIOD_SECONDS, IDLE_CHECK_PERIOD_SECONDS, TimeUnit.SECONDS);
 
@@ -476,37 +350,19 @@ public class SSHUtil implements AutoCloseable {
     }
 
     /**
-     * 清理资源
+     * 关闭连接（释放所有资源）
      */
-    private void cleanUp() {
-        isConnected = false;
-
-        // 关闭流（加保护）
+    public void disconnect() {
+        // 关闭Shell通道相关资源
         try {
-            if (shellReader != null) {
-                shellReader.close();
-            }
+            if (shellReader != null) shellReader.close();
+            if (shellInput != null) shellInput.close();
+            if (shellOutput != null) shellOutput.close();
         } catch (IOException e) {
-            log.debug("关闭shellReader失败", e);
+            log.error("关闭Shell流失败", e);
         }
 
-        try {
-            if (shellInput != null) {
-                shellInput.close();
-            }
-        } catch (IOException e) {
-            log.debug("关闭shellInput失败", e);
-        }
-
-        try {
-            if (shellOutput != null) {
-                shellOutput.close();
-            }
-        } catch (IOException e) {
-            log.debug("关闭shellOutput失败", e);
-        }
-
-        // 关闭通道
+        // 关闭Shell通道
         if (channelShell != null && channelShell.isConnected()) {
             channelShell.disconnect();
             log.debug("Shell通道已关闭");
@@ -515,18 +371,10 @@ public class SSHUtil implements AutoCloseable {
         // 关闭Session
         if (session != null && session.isConnected()) {
             session.disconnect();
-            log.debug("SSH Session已关闭");
+            log.info("关闭SSH连接：{}:{}", host, port);
         }
 
         idleCheckScheduled = false;
-    }
-
-    /**
-     * 关闭连接
-     */
-    public void disconnect() {
-        cleanUp();
-        log.info("SSH连接已关闭：{}:{}", host, port);
     }
 
     @Override
@@ -535,9 +383,52 @@ public class SSHUtil implements AutoCloseable {
     }
 
     /**
-     * 获取连接状态
+     * 测试方法（验证cd命令上下文保持）
      */
-    public boolean isConnected() {
-        return isConnected;
+    public static void main(String[] args) {
+        try {
+            // 创建SSH连接（Termux环境）
+            SSHUtil ssh = SSHUtil.createWithPassword("192.168.1.20", 8022, "u0_a369", "123456", 30000);
+            ssh.connect();
+
+            // 测试单条命令
+            System.out.println("=== 测试单条pwd命令 ===");
+            String pwdResult = ssh.executeCommand("pwd");
+            System.out.println("单条命令执行结果：\n" + pwdResult);
+
+            // 测试cd命令
+            System.out.println("\n=== 测试cd test命令 ===");
+            String cdResult = ssh.executeCommand("cd test");
+            System.out.println("单条命令执行结果：\n" + cdResult);
+
+            // 再次执行pwd验证路径
+            System.out.println("\n=== 再次执行pwd验证路径 ===");
+            String pwdResult2 = ssh.executeCommand("pwd");
+            System.out.println("单条命令执行结果：\n" + pwdResult2);
+
+            // 测试多条命令
+            System.out.println("\n=== 测试多条命令 ===");
+            String multiResult = ssh.executeCommands(
+                    "mkdir test",
+                    "cd test",
+                    "pwd",
+                    "cd ..",
+                    "pwd"
+            );
+            System.out.println("多条命令执行结果：\n" + multiResult);
+
+            // 验证空闲超时
+            log.info("等待10秒，验证空闲超时自动关闭...");
+            Thread.sleep(10000);
+
+            // 超时后执行命令
+            System.out.println("\n=== 超时后执行pwd ===");
+            String pwdResult3 = ssh.executeCommand("pwd");
+            System.out.println("执行结果：\n" + pwdResult3);
+
+            ssh.disconnect();
+        } catch (Exception e) {
+            log.error("测试失败", e);
+        }
     }
 }

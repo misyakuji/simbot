@@ -1,0 +1,79 @@
+package com.miko.config;
+
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+@Configuration
+public class WebClientConfig {
+
+    /**
+     * 默认超时时间（毫秒）
+     */
+    private static final int DEFAULT_TIMEOUT_MILLIS = 30000;
+    /**
+     * 默认读写超时时间（秒）
+     */
+    private static final int DEFAULT_TIMEOUT_SECONDS = 30;
+
+
+    private static final String BASE_URL = "http://localhost:3000";
+
+    @Bean
+    public WebClient webClient() {
+        // 配置 HttpClient 连接池和超时
+        HttpClient httpClient = HttpClient.create()
+                // 连接超时
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIMEOUT_MILLIS)
+                // 读写超时
+                .doOnConnected(conn -> conn
+                        .addHandlerLast(new ReadTimeoutHandler(DEFAULT_TIMEOUT_SECONDS, TimeUnit.SECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(DEFAULT_TIMEOUT_SECONDS, TimeUnit.SECONDS))
+                );
+        // 配置ExchangeStrategies以支持大文件传输
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                .build();
+
+        return WebClient.builder()
+                .exchangeStrategies(strategies)
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                // 全局请求头
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                // 基础 URL（可选，调用时可覆盖）
+                .baseUrl(BASE_URL)
+                // 绑定 HttpClient 配置
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+    }
+
+    /**
+     * 创建自定义配置的WebClient
+     *
+     * @param baseUrl 基础URL
+     * @return WebClient实例
+     */
+    public WebClient createWebClient(String baseUrl) {
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                .build();
+
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .exchangeStrategies(strategies)
+                .build();
+    }
+}

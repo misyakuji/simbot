@@ -57,12 +57,17 @@ public class MessageEventListener {
             botNickname = event.getBot().getName();
         }
         // BotID
-        String botId = event.getBot().getId().toString();
+        String botId = event.getSourceEvent().getSelfId().toString();
         //默认不回复群消息
         AtomicBoolean isReply = new AtomicBoolean(false);
         // 消息内容
         StringBuilder msgfix = new StringBuilder();
         event.getSourceEvent().getMessage().forEach(msg -> {
+            if (msg instanceof OneBotReply reply) {
+                ID id = reply.getId();
+//                GetMsgApi.create(id).getApiResultDeserializer().deserialize().getData().getMessage()
+            }
+
             if (msg instanceof OneBotText text) {
                 msgfix.append(text.getData().getText());
             } else if (msg instanceof OneBotImage image) {
@@ -96,11 +101,11 @@ public class MessageEventListener {
 
     }
 
-//    @Listener
-//    @Filter("cmd")
-//    public void friendMsgCmdEvent(OneBotFriendMessageEvent event) throws InterruptedException {
-//        event.getContent().sendAsync("执行命令:"+ event.getSourceEvent().getMessage().getFirst());
-//    }
+    @Listener
+    @Filter("cmd")
+    public void friendMsgCmdEvent(OneBotFriendMessageEvent event) throws InterruptedException {
+        event.getContent().sendAsync("执行命令:"+ event.getSourceEvent().getMessage().getFirst());
+    }
     @Listener
     public void friendMsgEvent(OneBotFriendMessageEvent event) {
         // 好友ID

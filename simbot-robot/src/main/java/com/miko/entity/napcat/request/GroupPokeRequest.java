@@ -1,0 +1,25 @@
+package com.miko.entity.napcat.request;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+/**
+ * 发送群聊戳一戳请求实体
+ * 用于调用 /group_poke 接口在群聊中发送戳一戳
+ */
+@Data
+@Accessors(chain = true)
+public class GroupPokeRequest {
+
+    /**
+     * 群ID
+     * 支持数字或字符串类型
+     */
+    private String groupId;
+
+    /**
+     * 用户ID
+     * 支持数字或字符串类型
+     */
+    private String userId;
+}
