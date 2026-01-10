@@ -17,6 +17,7 @@ import org.springframework.context.annotation.PropertySource;
         value = "classpath:simbot-bots/default.bot.json",
         factory = JsonPropertySourceFactory.class
 )
+@ConfigurationProperties()
 public class SimBotConfig {
 
     /**
