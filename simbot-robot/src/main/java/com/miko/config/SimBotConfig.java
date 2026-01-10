@@ -1,6 +1,7 @@
 package com.miko.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.miko.factory.JsonPropertySourceFactory;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

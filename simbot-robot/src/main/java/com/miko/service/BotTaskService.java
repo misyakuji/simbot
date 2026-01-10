@@ -2,18 +2,18 @@ package com.miko.service;
 
 import com.miko.entity.BotTaskModel;
 import com.miko.mapper.BotTaskMapper;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BotTaskService {
 
-    @Resource
-    private BotTaskMapper botTaskMapper;
+    private final BotTaskMapper botTaskMapper;
 
     public List<BotTaskModel> getAllActive(){
         return botTaskMapper.getAllActive();
-    };
+    }
 }

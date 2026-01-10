@@ -87,6 +87,11 @@
             <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

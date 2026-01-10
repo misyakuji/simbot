@@ -1,4 +1,4 @@
-package com.miko.config;
+package com.miko.factory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.env.MapPropertySource;

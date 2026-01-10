@@ -1,8 +1,8 @@
-package com.miko.config;
+package com.miko.util;
 
+import com.miko.config.SimBotConfig;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 /**

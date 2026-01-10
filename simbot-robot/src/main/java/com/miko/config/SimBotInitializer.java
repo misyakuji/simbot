@@ -1,5 +1,6 @@
 package com.miko.config;
 
+import com.miko.util.SimBotConfigUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class SimBotInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         log.info("=== SimBot OneBot v11 启动 ===");
         log.info("组件类型: {}", simBotConfig.getComponent());
         log.info("Bot唯一ID: {}", simBotConfig.getAuthorization().getBotUniqueId());
