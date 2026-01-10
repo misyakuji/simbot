@@ -2,6 +2,7 @@ package com.miko.entity.napcat.enums;
 
 import com.miko.entity.napcat.request.*;
 import com.miko.entity.napcat.response.*;
+import lombok.Getter;
 import org.springframework.http.HttpMethod;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.http.HttpMethod;
  * @author misyakuji
  * @since 2026-01-10
  */
+@Getter
 public enum NapCatApiEnum {
 
     /**
@@ -297,51 +299,6 @@ public enum NapCatApiEnum {
         this.description = description;
         this.requestClass = requestClass;
         this.responseClass = responseClass;
-    }
-
-    /**
-     * 获取API路径
-     *
-     * @return API路径
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * 获取HTTP请求方法
-     *
-     * @return HTTP请求方法
-     */
-    public HttpMethod getMethod() {
-        return method;
-    }
-
-    /**
-     * 获取功能描述
-     *
-     * @return 功能描述
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * 获取请求参数类
-     *
-     * @return 请求参数类
-     */
-    public Class<?> getRequestClass() {
-        return requestClass;
-    }
-
-    /**
-     * 获取响应结果类
-     *
-     * @return 响应结果类
-     */
-    public Class<?> getResponseClass() {
-        return responseClass;
     }
 
     /**
