@@ -3,13 +3,18 @@ package com.miko.entity.napcat.request;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 贴表情请求实体
  * 用于调用 /set_msg_emoji_like 接口为消息贴表情
  */
 @Data
 @Accessors(chain = true)
-public class SetMsgEmojiLikeRequest {
+public class SetMsgEmojiLikeRequest implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 消息ID

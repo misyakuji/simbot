@@ -3,13 +3,18 @@ package com.miko.entity.napcat.response;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 撤回消息响应实体
  * 用于接收 /delete_msg 接口的返回结果
  */
 @Data
 @Accessors(chain = true)
-public class DeleteMsgResponse {
+public class DeleteMsgResponse implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 状态

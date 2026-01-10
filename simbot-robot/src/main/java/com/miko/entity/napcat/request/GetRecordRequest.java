@@ -3,13 +3,18 @@ package com.miko.entity.napcat.request;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 获取语音消息详情请求实体
  * 用于调用 /get_record 接口获取语音消息详情
  */
 @Data
 @Accessors(chain = true)
-public class GetRecordRequest {
+public class GetRecordRequest implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 文件（可选，二选一）

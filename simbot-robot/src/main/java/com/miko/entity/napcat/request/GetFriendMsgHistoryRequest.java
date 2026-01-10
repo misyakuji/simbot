@@ -3,13 +3,18 @@ package com.miko.entity.napcat.request;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 获取好友历史消息请求实体
  * 用于调用 /get_friend_msg_history 接口获取好友历史消息
  */
 @Data
 @Accessors(chain = true)
-public class GetFriendMsgHistoryRequest {
+public class GetFriendMsgHistoryRequest implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 用户ID

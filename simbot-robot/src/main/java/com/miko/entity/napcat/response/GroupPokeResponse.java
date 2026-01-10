@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 发送群聊戳一戳响应实体
  * 用于接收 /group_poke 接口的返回结果
@@ -13,7 +16,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class GroupPokeResponse {
+public class GroupPokeResponse implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 状态

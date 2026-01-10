@@ -3,13 +3,18 @@ package com.miko.entity.napcat.response;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 发送戳一戳响应实体
  * 用于接收 /send_poke 接口的返回结果
  */
 @Data
 @Accessors(chain = true)
-public class SendPokeResponse {
+public class SendPokeResponse implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 状态

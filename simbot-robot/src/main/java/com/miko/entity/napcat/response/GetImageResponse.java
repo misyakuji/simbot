@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 获取图片消息详情响应实体
  * 用于接收 /get_image 接口的返回结果
@@ -13,7 +16,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class GetImageResponse {
+public class GetImageResponse implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 状态
