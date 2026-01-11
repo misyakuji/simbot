@@ -1,11 +1,10 @@
 package com.miko.service;
 
+import com.miko.config.SimBotConfig;
 import com.miko.entity.napcat.enums.NapCatApiEnum;
 import com.miko.exception.ApiException;
 import com.miko.util.JsonUtils;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -37,17 +36,12 @@ public class BaseApiService {
      */
     private final WebClient webClient;
 
+    private final SimBotConfig simBotConfig;
+
     /**
      * 默认超时时间（秒）
      */
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
-
-    /**
-     * 默认基础URL
-     */
-    @Getter
-    @Setter
-    private String baseUrl = "http://localhost:3000";
 
     /**
      * 调用API（根据API枚举）
@@ -164,7 +158,7 @@ public class BaseApiService {
             WebClient.RequestBodySpec requestSpec = webClient
                 .method(method)
                 .uri(uriBuilder -> {
-                    String fullPath = baseUrl + path;
+                    String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;
                     uriBuilder.path(fullPath);
                     if (queryParams != null && !queryParams.isEmpty()) {
                         queryParams.forEach(uriBuilder::queryParam);
@@ -252,7 +246,7 @@ public class BaseApiService {
             WebClient.RequestBodySpec requestSpec = webClient
                 .method(method)
                 .uri(uriBuilder -> {
-                    String fullPath = baseUrl + path;
+                    String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;
                     uriBuilder.path(fullPath);
                     if (queryParams != null && !queryParams.isEmpty()) {
                         queryParams.forEach(uriBuilder::queryParam);

@@ -241,24 +241,4 @@ public class NapCatApiService {
         return baseApiService.callApi(NapCatApiEnum.FETCH_EMOJI_LIKE, request, FetchEmojiLikeResponse.class);
     }
 
-    // ==================== 工具方法 ====================
-
-    /**
-     * 设置API基础URL
-     *
-     * @param baseUrl 基础URL
-     */
-    public void setBaseUrl(String baseUrl) {
-        baseApiService.setBaseUrl(baseUrl);
-        log.info("设置API基础URL: {}", baseUrl);
-    }
-
-    /**
-     * 获取API基础URL
-     *
-     * @return 基础URL
-     */
-    public String getBaseUrl() {
-        return baseApiService.getBaseUrl();
-    }
 }

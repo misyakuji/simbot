@@ -22,7 +22,7 @@ import org.springframework.context.annotation.PropertySource;
 public class SimBotConfig {
 
     /**
-     * 固定值: simbot.onebot11
+     * 组件
      */
     private String component;
 
@@ -46,20 +46,19 @@ public class SimBotConfig {
         private String botUniqueId;
 
         /**
-         * api地址，是个http/https服务器的路径，默认localhost:3000
+         * api地址
          */
         @JsonProperty("apiServerHost")
         private String apiServerHost;
 
         /**
-         * 订阅事件的服务器地址，是个ws/wss路径，默认 `null`
-         * 如果为 `null` 则不会连接 ws 和订阅事件
+         * 订阅事件的服务地址
          */
         @JsonProperty("eventServerHost")
         private String eventServerHost;
 
         /**
-         * 配置的 token，可以是null，代表同时配置 apiAccessToken 和 eventAccessToken
+         * token
          */
         @JsonProperty("accessToken")
         private String accessToken;

@@ -11,9 +11,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.resources.ConnectionProvider;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -28,8 +26,6 @@ public class WebClientConfig {
      */
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
 
-
-    private static final String BASE_URL = "http://localhost:3000";
 
     @Bean
     public WebClient webClient() {
@@ -53,27 +49,8 @@ public class WebClientConfig {
                 // 全局请求头
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                // 基础 URL（可选，调用时可覆盖）
-                .baseUrl(BASE_URL)
                 // 绑定 HttpClient 配置
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
-    }
-
-    /**
-     * 创建自定义配置的WebClient
-     *
-     * @param baseUrl 基础URL
-     * @return WebClient实例
-     */
-    public WebClient createWebClient(String baseUrl) {
-        ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
-                .build();
-
-        return WebClient.builder()
-                .baseUrl(baseUrl)
-                .exchangeStrategies(strategies)
                 .build();
     }
 }
