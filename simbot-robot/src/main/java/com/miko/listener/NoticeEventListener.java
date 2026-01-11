@@ -63,7 +63,7 @@ public class NoticeEventListener {
     @Listener
     public void groupRecallEvent(OneBotGroupRecallEvent event) {
         log.info("群消息撤回事件{}", event);
-        event.getContent().sendAsync("撤回了啥，让我瞅瞅");
+//        event.getContent().sendAsync("撤回了啥，让我瞅瞅");
     }
 
     /**
