@@ -92,5 +92,10 @@ public class ArkDoubaoService {
     public List<String> getModelList() {
         return volcArkConfig.models;
     }
-
+    public String getCurrentModel() {
+        return volcArkConfig.model;
+    }
+    public void setCurrentModel(String model) {
+        volcArkConfig.model = model;
+    }
 }
