@@ -44,7 +44,7 @@ public class ArkDoubaoService {
         try {
             // 构建请求对象
             CreateResponsesRequest request = CreateResponsesRequest.builder()
-                    .model(volcArkConfig.model)
+                    .model(volcArkConfig.getModel())
                     .input(ResponsesInput.builder().stringValue(prompt.trim()).build())
                     // 可选:启用/关闭深度思考,按需放开
                     // .thinking(ResponsesThinking.builder().type(ResponsesConstants.THINKING_TYPE_DISABLED).build())
@@ -74,7 +74,7 @@ public class ArkDoubaoService {
         messages.add(userMessage);
 
         ChatCompletionRequest streamChatCompletionRequest = ChatCompletionRequest.builder()
-                .model(volcArkConfig.model)
+                .model(volcArkConfig.getModel())
                 .messages(messages)
                 .build();
 
@@ -90,12 +90,12 @@ public class ArkDoubaoService {
     }
 
     public List<String> getModelList() {
-        return volcArkConfig.models;
+        return volcArkConfig.getModels();
     }
     public String getCurrentModel() {
-        return volcArkConfig.model;
+        return volcArkConfig.getModel();
     }
     public void setCurrentModel(String model) {
-        volcArkConfig.model = model;
+        volcArkConfig.setModel(model);
     }
 }
