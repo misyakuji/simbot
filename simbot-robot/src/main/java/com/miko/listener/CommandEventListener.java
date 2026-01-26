@@ -1,6 +1,7 @@
 package com.miko.listener;
 
 import com.miko.config.VolcArkConfig;
+import com.miko.entity.ChatContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotFriendMessageEvent;
@@ -9,7 +10,9 @@ import love.forte.simbot.quantcat.common.annotations.Listener;
 import love.forte.simbot.quantcat.common.filter.MatchType;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +25,7 @@ import java.util.stream.IntStream;
 public class CommandEventListener {
 
     private final VolcArkConfig volcArkConfig;
+    private final MessageEventListener messageEventListener;
 
     @Listener
     @Filter("/模型列表")
@@ -129,4 +133,122 @@ public class CommandEventListener {
         volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
     }
 
+    @Listener
+    @Filter("/对话列表")
+    @Filter("/查看对话")
+    @Filter(value = "^/chatList", matchType = MatchType.REGEX_MATCHES)
+    public void chatListCmdEvent(OneBotFriendMessageEvent event) {
+        try {
+            // 获取对话上下文
+            Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+            
+            if (chatContexts.isEmpty()) {
+                event.getContent().sendAsync("📋 当前没有正在进行的对话");
+                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                return;
+            }
+            
+            // 格式化对话列表
+            StringBuilder replyContent = new StringBuilder();
+            replyContent.append("📋 当前对话列表：\n\n");
+            
+            List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
+            for (int i = 0; i < chatList.size(); i++) {
+                Map.Entry<String, ChatContext> entry = chatList.get(i);
+                String key = entry.getKey();
+                ChatContext context = entry.getValue();
+                
+                replyContent.append(String.format("%d. 对话ID：%s\n", i + 1, key));
+                replyContent.append(String.format("   聊天类型：%s\n", context.getChatType()));
+                replyContent.append(String.format("   聊天ID：%s\n", context.getChatId()));
+                replyContent.append(String.format("   消息数量：%d\n\n", context.getMessages() != null ? context.getMessages().size() : 0));
+            }
+            
+            // 发送回复
+            event.getContent().sendAsync(replyContent.toString());
+        } catch (Exception e) {
+            log.error("查看对话列表失败", e);
+            event.getContent().sendAsync("❌ 查看对话列表失败：" + e.getMessage());
+        }
+        
+        // 标记中断后续监听
+        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+    }
+
+    @Listener
+    @Filter(
+            value = "^(?:/删除对话|/removeChat)(.*)$", // 匹配指令格式
+            matchType = MatchType.REGEX_MATCHES
+    )
+    public void deleteChatCmdEvent(OneBotFriendMessageEvent event) {
+        String cmd = Objects.requireNonNull(event.getMessageContent().getPlainText()).trim();
+        Matcher matcher = Pattern.compile("^(?:/删除对话|/removeChat)(\\d+)$").matcher(cmd);
+        
+        if (!matcher.find()) {
+            event.getContent().sendAsync("❌ 指令格式错误！正确格式：/删除对话1 或 /removeChat1");
+            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            return;
+        }
+        
+        int chatIndex;
+        try {
+            chatIndex = Integer.parseInt(matcher.group(1)); // 提取对话序号
+        } catch (NumberFormatException e) {
+            event.getContent().sendAsync("❌ 序号必须是数字！正确格式：/删除对话1");
+            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            return;
+        }
+        
+        try {
+            // 获取对话上下文
+            Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+            
+            if (chatContexts.isEmpty()) {
+                event.getContent().sendAsync("📋 当前没有正在进行的对话");
+                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                return;
+            }
+            
+            List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
+            
+            if (chatIndex < 1 || chatIndex > chatList.size()) {
+                String tip = String.format("❌ 对话序号超出范围！当前共有 %d 个对话", chatList.size());
+                event.getContent().sendAsync(tip);
+                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                return;
+            }
+            
+            // 删除指定序号的对话
+            Map.Entry<String, ChatContext> entryToRemove = chatList.get(chatIndex - 1);
+            String removedKey = entryToRemove.getKey();
+            ChatContext removedContext = entryToRemove.getValue();
+            
+            // 从上下文Map中删除
+            removeChatContextFromMessageEventListener(removedKey);
+            
+            String successMsg = String.format("✅ 成功删除对话！\n对话ID：%s\n聊天类型：%s\n聊天ID：%s", 
+                    removedKey, removedContext.getChatType(), removedContext.getChatId());
+            event.getContent().sendAsync(successMsg);
+            log.info("用户删除对话：{}", removedKey);
+        } catch (Exception e) {
+            log.error("删除对话失败", e);
+            event.getContent().sendAsync("❌ 删除对话失败：" + e.getMessage());
+        }
+        
+        // 标记中断后续监听
+        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+    }
+
+    // 反射获取MessageEventListener中的chatContexts
+    private Map<String, ChatContext> getChatContextsFromMessageEventListener() throws Exception {
+        java.lang.reflect.Field field = MessageEventListener.class.getDeclaredField("chatContexts");
+        field.setAccessible(true);
+        return (Map<String, ChatContext>) field.get(messageEventListener);
+    }
+
+    // 反射从MessageEventListener中删除指定的chatContext
+    private void removeChatContextFromMessageEventListener(String key) throws Exception {
+        Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+        chatContexts.remove(key);
+    }
 }
