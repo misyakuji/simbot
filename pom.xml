@@ -45,7 +45,7 @@
         <jsch.version>2.27.7</jsch.version>
 
         <!-- volcengine-java-sdk-ark-runtime -->
-        <volcengine-java-sdk-ark-runtime.version>1.0.4</volcengine-java-sdk-ark-runtime.version>
+        <volcengine-java-sdk-ark-runtime.version>1.0.7</volcengine-java-sdk-ark-runtime.version>
         <jackson.version>2.12.7.1</jackson.version>
         <retrofit.version>2.9.0</retrofit.version>
         <rxjava2.version>2.0.0</rxjava2.version>
