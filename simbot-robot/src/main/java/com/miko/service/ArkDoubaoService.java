@@ -4,6 +4,8 @@ import com.miko.config.VolcArkConfig;
 import com.volcengine.ark.runtime.model.completion.chat.ChatCompletionRequest;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessage;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessageRole;
+import com.volcengine.ark.runtime.model.responses.common.ResponsesThinking;
+import com.volcengine.ark.runtime.model.responses.constant.ResponsesConstants;
 import com.volcengine.ark.runtime.model.responses.request.CreateResponsesRequest;
 import com.volcengine.ark.runtime.model.responses.request.ResponsesInput;
 import com.volcengine.ark.runtime.model.responses.response.ResponseObject;
@@ -46,8 +48,9 @@ public class ArkDoubaoService {
             CreateResponsesRequest request = CreateResponsesRequest.builder()
                     .model(volcArkConfig.getModel())
                     .input(ResponsesInput.builder().stringValue(prompt.trim()).build())
-                    // 可选:启用/关闭深度思考,按需放开
-                    // .thinking(ResponsesThinking.builder().type(ResponsesConstants.THINKING_TYPE_DISABLED).build())
+                    .thinking(volcArkConfig.isDeepThinking()
+                            ? ResponsesThinking.builder().type(ResponsesConstants.THINKING_TYPE_ENABLED).build()
+                            : null)
                     .build();
 
             // 调用API并返回结果
@@ -76,6 +79,9 @@ public class ArkDoubaoService {
         ChatCompletionRequest streamChatCompletionRequest = ChatCompletionRequest.builder()
                 .model(volcArkConfig.getModel())
                 .messages(messages)
+                .thinking(volcArkConfig.isDeepThinking()
+                        ? new ChatCompletionRequest.ChatCompletionRequestThinking("enabled")
+                        : null)
                 .build();
 
         StringBuilder sb = new StringBuilder();
@@ -89,13 +95,4 @@ public class ArkDoubaoService {
         return sb.toString();
     }
 
-    public List<String> getModelList() {
-        return volcArkConfig.getModels();
-    }
-    public String getCurrentModel() {
-        return volcArkConfig.getModel();
-    }
-    public void setCurrentModel(String model) {
-        volcArkConfig.setModel(model);
-    }
 }

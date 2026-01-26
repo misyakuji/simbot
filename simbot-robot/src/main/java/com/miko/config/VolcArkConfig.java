@@ -3,12 +3,14 @@ package com.miko.config;
 import com.volcengine.ark.runtime.service.ArkService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import love.forte.simbot.common.id.ID;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 火山方舟 ArkService 配置类
@@ -28,9 +30,12 @@ public class VolcArkConfig {
 
     private String model;
 
+    private List<String> models;
+
     private boolean isDeepThinking;
 
-    private List<String> models;
+    // 全局线程安全标记：key=事件唯一ID，value=是否中断后续监听
+    private final ConcurrentHashMap<ID, Boolean> interruptFlag = new ConcurrentHashMap<>();
 
     @Bean(name = "arkService")
     public ArkService arkService() {
