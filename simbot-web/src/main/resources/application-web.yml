@@ -42,6 +42,8 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml
   type-aliases-package: com.miko.bean
+  configuration:
+    map-underscore-to-camel-case: true # 显式开启下划线转驼峰
 
 # 输出sql语句日志
 logging:
