@@ -256,6 +256,19 @@ public enum NapCatApiEnum {
             "发送私聊消息",
             SendPrivateMsgRequest.class,
             SendPrivateMsgResponse.class
+    ),
+
+    /*
+    /**
+     * 获取好友列表（带分类）
+     * <p>获取好友列表，支持分类</p>
+     */
+    GET_FRIENDS_WITH_CATEGORY(
+            "/get_friends_with_category",
+            HttpMethod.GET,
+            "获取好友列表（带分类）",
+            null,
+            GetFriendsWithCategoryResponse.class
     );
 
     /**

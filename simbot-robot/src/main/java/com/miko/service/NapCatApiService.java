@@ -241,4 +241,12 @@ public class NapCatApiService {
         return baseApiService.callApi(NapCatApiEnum.FETCH_EMOJI_LIKE, request, FetchEmojiLikeResponse.class);
     }
 
+    /**
+     * 获取好友列表（带分类）
+     *
+     * @return 响应对象
+     */
+    public GetFriendsWithCategoryResponse getFriendsWithCategory() {
+        return baseApiService.callApi(NapCatApiEnum.GET_FRIENDS_WITH_CATEGORY, null, GetFriendsWithCategoryResponse.class);
+    }
 }
