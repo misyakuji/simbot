@@ -22,20 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @ConfigurationProperties(prefix = "volc.ark")
 public class VolcArkConfig {
 
-    private String apiKey;
-
-    private String baseUrl;
-
-    private ArkService arkService;
-
-    private String model;
-
-    private List<String> models;
-
-    private boolean isDeepThinking;
-
     // 全局线程安全标记：key=事件唯一ID，value=是否中断后续监听
     private final ConcurrentHashMap<ID, Boolean> interruptFlag = new ConcurrentHashMap<>();
+    private String apiKey;
+    private String baseUrl;
+    private ArkService arkService;
+    private String model;
+    private List<String> models;
+    private boolean isDeepThinking;
 
     @Bean(name = "arkService")
     public ArkService arkService() {

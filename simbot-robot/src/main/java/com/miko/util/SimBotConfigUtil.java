@@ -11,12 +11,11 @@ import java.util.Optional;
 @Component
 public class SimBotConfigUtil {
 
-    private final SimBotConfig simBotConfig;
-
     // 默认值常量
     private static final String DEFAULT_API_SERVER = "http://localhost:3000";
     private static final int DEFAULT_WS_RETRY_TIMES = 2147483647; // Integer.MAX_VALUE
     private static final int DEFAULT_WS_RETRY_DELAY = 3500;
+    private final SimBotConfig simBotConfig;
 
     public SimBotConfigUtil(SimBotConfig simBotConfig) {
         this.simBotConfig = simBotConfig;

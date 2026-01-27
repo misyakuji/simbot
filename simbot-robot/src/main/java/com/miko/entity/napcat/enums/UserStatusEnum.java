@@ -530,33 +530,6 @@ public enum UserStatusEnum {
     }
 
     /**
-     * 获取status值
-     *
-     * @return status值
-     */
-    public int getStatus() {
-        return data.getStatus();
-    }
-
-    /**
-     * 获取ext_status值
-     *
-     * @return ext_status值
-     */
-    public int getExtStatus() {
-        return data.getExtStatus();
-    }
-
-    /**
-     * 获取battery_status值
-     *
-     * @return battery_status值
-     */
-    public int getBatteryStatus() {
-        return data.getBatteryStatus();
-    }
-
-    /**
      * 根据status和ext_status查找对应的状态枚举
      *
      * @param status    状态值
@@ -588,6 +561,33 @@ public enum UserStatusEnum {
             }
         }
         return null;
+    }
+
+    /**
+     * 获取status值
+     *
+     * @return status值
+     */
+    public int getStatus() {
+        return data.getStatus();
+    }
+
+    /**
+     * 获取ext_status值
+     *
+     * @return ext_status值
+     */
+    public int getExtStatus() {
+        return data.getExtStatus();
+    }
+
+    /**
+     * 获取battery_status值
+     *
+     * @return battery_status值
+     */
+    public int getBatteryStatus() {
+        return data.getBatteryStatus();
     }
 
     @Override

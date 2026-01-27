@@ -32,16 +32,14 @@ import java.util.Map;
 public class BaseApiService {
 
     /**
-     * WebClient实例
-     */
-    private final WebClient webClient;
-
-    private final SimBotConfig simBotConfig;
-
-    /**
      * 默认超时时间（秒）
      */
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
+    /**
+     * WebClient实例
+     */
+    private final WebClient webClient;
+    private final SimBotConfig simBotConfig;
 
     /**
      * 调用API（根据API枚举）
