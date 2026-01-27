@@ -42,7 +42,7 @@
         <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-client-java-jvm</artifactId>
-            <version>3.3.3</version>
+<!--            <version>3.4.0</version>-->
             <scope>runtime</scope>
         </dependency>
 

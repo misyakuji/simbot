@@ -39,8 +39,8 @@
         <httputil.version>0.9.6</httputil.version>
         <fastjson.version>2.0.33</fastjson.version>
         <snakeyaml.version>2.5</snakeyaml.version>
-        <simbot.version>4.15.0</simbot.version>
-        <onebot.version>1.9.0</onebot.version>
+        <simbot.version>5.0.0-Preview1</simbot.version>
+        <onebot.version>5.0.0-Preview1</onebot.version>
         <ktor.version>2.3.13</ktor.version>
         <jsch.version>2.27.7</jsch.version>
 
