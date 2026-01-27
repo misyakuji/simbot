@@ -43,7 +43,7 @@ public class BotScheduledTask {
      * 每五分钟发送一次: 0 0/5 * * * ?
      * 每天晚上8点: 0 0 20 * * ?
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0 20 * * ?")
     public void goodMorning() {
         try {
             List<BotTaskModel> allTask = botTaskService.getAllActive();
