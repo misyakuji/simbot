@@ -1,138 +1,117 @@
-//package com.miko.quartz;
-//
-//import com.miko.entity.BotTaskModel;
-//import com.miko.service.BotTaskService;
-//import com.miko.util.ApiUtil;
-//import com.miko.util.JsonUtil;
-//import jakarta.annotation.Resource;
-//import lombok.val;
-//import love.forte.simbot.ID;
-//import love.forte.simbot.Identifies;
-//import love.forte.simbot.application.BotManagers;
-//import love.forte.simbot.bot.BotManager;
-//import love.forte.simbot.component.mirai.MiraiFriend;
-//import love.forte.simbot.component.mirai.bot.MiraiBot;
-//import love.forte.simbot.component.mirai.bot.MiraiBotManager;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.scheduling.annotation.Scheduled;
-//import org.springframework.stereotype.Component;
-//
-//import java.io.IOException;
-//import java.util.Arrays;
-//import java.util.Calendar;
-//import java.util.HashMap;
-//import java.util.List;
-//
-///**
-// * Bot定时任务
-// */
-//@Component
-//public class BotScheduledTask {
-//    private static final Logger LOGGER = LoggerFactory.getLogger(BotScheduledTask.class);
-//    @Autowired
-//    private BotManagers botManagers;
-//    @Resource
-//    private BotTaskService botTaskService;
-//
-//    @Value(value = "${simbot.default-master-qq}")
-//    private String defaultMaster;
-//
-//    @Value("${simbot.default-notice-groups}")
-//    private List<String> defaultGroups;
-//
-//
-//
-//    /**
-//     * 每一小时发送一次: 0 0 0/1 * * ?
-//     * 每五分钟发送一次: 0 0/5 * * * ?
-//     * 每天晚上8点: 0 0 20 * * ?
-//     */
-//    @Scheduled(cron = "0 0 8 * * ?")
-//    public void goodMorning() {
-//        try {
-//            MiraiBot bot = getBot();
-//            assert bot != null;
-//            List<BotTaskModel> allTask = botTaskService.getAllActive();
-//            LOGGER.info("正在发送定时任务 List={}", allTask);
-//            allTask.forEach(task -> {
-//                if ("0".equals(task.getTypes())) {
-//                    Arrays.stream(task.getTargets().split(",")).forEach(target -> {
-//                        val group = bot.getGroup(ID.$(target));
-//                        if (group != null) {
-//                            group.sendAsync(task.getContents());
-//                        } else {
-//                            LOGGER.info("消息发送失败，群组{}不存在", target);
-//                        }
-//
-//                    });
-//                } else {
-//                    Arrays.stream(task.getTargets().split(",")).forEach(target -> {
-//                        MiraiFriend friend = bot.getFriend(Identifies.ID(target));
-//                        if (friend != null) {
-//                            friend.sendAsync(task.getContents());
-//                        } else {
-//                            LOGGER.info("消息发送失败，好友{}不存在", target);
-//                        }
-//
-//                    });
-//                }
-//            });
-//        } catch (Exception e) {
-//            LOGGER.error("定时任务发送异常, e={}", e);
+package com.miko.quartz;
+
+import com.miko.config.SimBotConfig;
+import com.miko.entity.BotTaskModel;
+import com.miko.service.BotTaskService;
+import kotlin.sequences.SequencesKt;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import love.forte.simbot.application.Application;
+import love.forte.simbot.common.id.Identifies;
+import love.forte.simbot.component.onebot.v11.core.api.OneBotMessageOutgoing;
+import love.forte.simbot.component.onebot.v11.core.api.SendGroupMsgApi;
+import love.forte.simbot.component.onebot.v11.core.api.SendPrivateMsgApi;
+import love.forte.simbot.component.onebot.v11.core.bot.OneBotBot;
+import love.forte.simbot.component.onebot.v11.core.bot.OneBotBotManager;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+
+/**
+ * Bot定时任务
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class BotScheduledTask {
+
+    private final SimBotConfig simBotConfig;
+    
+    private final BotTaskService botTaskService;
+
+    private final Application application;
+
+
+    /**
+     * 每一小时发送一次: 0 0 0/1 * * ?
+     * 每五分钟发送一次: 0 0/5 * * * ?
+     * 每天晚上8点: 0 0 20 * * ?
+     */
+    @Scheduled(cron = "0 0/1 * * * ?")
+    public void goodMorning() {
+        try {
+            List<BotTaskModel> allTask = botTaskService.getAllActive();
+            log.info("正在发送定时任务 List={}", allTask);
+            allTask.forEach(task -> {
+                if ("0".equals(task.getTargetType())) {
+                    getBot().executeAsync(SendGroupMsgApi.create(Identifies.of(task.getTargetId()),
+                            OneBotMessageOutgoing.create(task.getContent())));
+
+                } else if ("1".equals(task.getTargetType())){
+                    getBot().executeAsync(SendPrivateMsgApi.create(Identifies.of(task.getTargetId()),
+                            OneBotMessageOutgoing.create(task.getContent())));
+
+                }
+            });
+        } catch (Exception e) {
+            log.error("定时任务发送异常!", e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0/1 * * ?")
+    public void loveGreeting() {
+        Calendar calendar = Calendar.getInstance();
+        // 获取当前小时
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        // 只在早上8点到晚上22点发送消息
+//        if (hour < 8 || hour > 22) {
+//            return;
 //        }
-//    }
-//
-//    @Scheduled(cron = "0 0/1 * * * ?")
-//    public void loveGreeting() {
-//        Calendar calendar = Calendar.getInstance();
-//        // 获取当前小时
-//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-//        // 只在早上8点到晚上22点发送消息
-////        if (hour < 8 || hour > 22) {
-////            return;
-////        }
-//
-//        try {
-//            MiraiBot bot = getBot();
-//            assert bot != null;
-//            final String msg = ApiUtil.callGet("https://api.mcloc.cn/love/");
-//
-//            defaultGroups.forEach(id -> {
-//                val group = bot.getGroup(ID.$(id));
-//                LOGGER.info("正在发送定时任务,group={}, msg={}", id, msg);
-//                if (group != null) {
-//                    group.sendAsync(msg.trim());
-//                } else {
-//                    LOGGER.info("消息发送失败，group={}, msg={}", id, msg);
-//                }
-//            });
-//
-////            MiraiFriend friend = bot.getFriend(Identifies.ID(defaultMaster));
-////            if (friend != null) {
-////                friend.sendAsync(msg);
-////            } else {
-////                LOGGER.info("消息发送失败，friend={}, msg={}", defaultMaster, msg);
-////            }
-//        } catch (Exception e) {
-//            LOGGER.error("定时任务发送异常, e={}", e);
-//        }
-//    }
-//
-//    public MiraiBot getBot() throws IOException {
-//        HashMap result = JsonUtil.parseJson("simbot-bots/default.bot.json");
-//        val botId = result.get("code");
-//        // 获取所有的bot
-//        for (BotManager<?> manager : botManagers) {
-//            if (manager instanceof MiraiBotManager miraiBotManager) {
-//                MiraiBot bot = miraiBotManager.get(Identifies.ID((Long) botId));
-//                if (bot != null) {
-//                    return bot;
-//                }
-//            }
-//        }
-//        return null;
-//    }
-//}
+
+        try {
+            OneBotBot bot = getBot();
+            assert bot != null;
+            String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            final String msg = currentTime +" hello";
+            var defaultGroups = new String[]{"710117186", "710117186"};
+            Arrays.stream(defaultGroups).forEach(id -> {
+                val group = Identifies.of(id);
+                log.info("正在发送定时任务,group={}, msg={}", id, msg);
+                if (group != null) {
+                    bot.executeAsync(SendGroupMsgApi.create(group, OneBotMessageOutgoing.create(msg)));
+                } else {
+                    log.info("消息发送失败，group={}, msg={}", id, msg);
+                }
+            });
+        } catch (Exception e) {
+            log.error("定时任务发送异常!", e);
+        }
+    }
+
+    public OneBotBot getBot() {
+        val botId = simBotConfig.getAuthorization().getBotUniqueId();
+        var obManager = application.getBotManagers()
+                .stream()
+                .filter(it -> it instanceof OneBotBotManager)
+                .map(it -> (OneBotBotManager) it)
+                .findFirst()
+                .orElseThrow();
+
+        // 遍历bot
+        obManager.all().iterator().forEachRemaining(bot -> {
+            // ...
+        });
+
+        // 也可以转成List
+        final var list = SequencesKt.toList(obManager.all());
+
+        // 通过你配置的 uniqueBotId 获取
+        return obManager.get(Identifies.of(botId));
+    }
+}

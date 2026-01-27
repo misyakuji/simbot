@@ -13,9 +13,11 @@ public class BotTaskModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // 消息内容
-    private String contents;
+    private String content;
     // 发送目标
-    private String targets;
+    private String targetType;
+    // 发送目标
+    private String targetId;
     // 类型
-    private String types;
+    private String type;
 }
