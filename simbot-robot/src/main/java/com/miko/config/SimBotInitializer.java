@@ -1,6 +1,7 @@
 package com.miko.config;
 
 import com.miko.util.SimBotConfigUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -10,15 +11,11 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SimBotInitializer implements CommandLineRunner {
 
     private final SimBotConfig simBotConfig;
     private final SimBotConfigUtil configUtil;
-
-    public SimBotInitializer(SimBotConfig simBotConfig, SimBotConfigUtil configUtil) {
-        this.simBotConfig = simBotConfig;
-        this.configUtil = configUtil;
-    }
 
     @Override
     public void run(String... args) {
