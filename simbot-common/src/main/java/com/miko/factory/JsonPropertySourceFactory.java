@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * 自定义JSON属性源工厂
- * 用于解析simbot-bots目录下的JSON配置文件
+ * 用于解析JSON配置文件
  */
 public class JsonPropertySourceFactory implements PropertySourceFactory {
 
