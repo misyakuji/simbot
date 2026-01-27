@@ -8,8 +8,8 @@ spring:
   datasource:
     username: simbot_user
     password: simbot_pass
-#    url: jdbc:mariadb://127.0.0.1:3306/simbot?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
-#    driver-class-name: org.mariadb.jdbc.Driver
+    #    url: jdbc:mariadb://127.0.0.1:3306/simbot?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
+    #    driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/simbot?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource            # 数据库连接池类别

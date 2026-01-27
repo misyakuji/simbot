@@ -27,12 +27,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class MessageEventListener {
     private final VolcArkConfig volcArkConfig;
-    
+
     private final ArkDoubaoService arkDoubaoService;
-    
+
     // 存储对话上下文: key = 对话类型+群聊ID/好友ID+对话ID value = 该对话的上下文
     private final Map<String, ChatContext> chatContexts = new ConcurrentHashMap<>();
-    
+
     @Listener
     public void msgEvent(OneBotMessageEvent event) {
         log.debug("msgEvent: {}", event);
@@ -73,7 +73,7 @@ public class MessageEventListener {
             volcArkConfig.getInterruptFlag().remove(event.getMessageId()); // 清理标记，避免内存泄漏
             return;
         }
-        if (Objects.requireNonNull(event.getMessageContent().getPlainText()).startsWith("/")){
+        if (Objects.requireNonNull(event.getMessageContent().getPlainText()).startsWith("/")) {
             return;
         }
         // 群昵称
@@ -82,9 +82,9 @@ public class MessageEventListener {
         String groupId = event.getContent().getId().toString();
         // 消息内容
         String msgfix = OneBotMessageUtil.fixMessage(event);
-        
+
         // 获取该群的对话上下文，如果不存在则创建新的
-        String referenceKey = ChatContext.ChatType.PRIVATE.toString() + groupId;
+        String referenceKey = ChatContext.ChatType.PRIVATE + groupId;
         ChatContext chatContext = chatContexts.computeIfAbsent(referenceKey, k ->
                 ChatContext.builder()
                         .chatId(Identifies.of(groupId))
@@ -105,7 +105,7 @@ public class MessageEventListener {
             volcArkConfig.getInterruptFlag().remove(event.getId()); // 清理标记，避免内存泄漏
             return;
         }
-        if (Objects.requireNonNull(event.getMessageContent().getPlainText()).startsWith("/")){
+        if (Objects.requireNonNull(event.getMessageContent().getPlainText()).startsWith("/")) {
             return;
         }
         // 好友ID
@@ -115,14 +115,14 @@ public class MessageEventListener {
         // 消息内容
         String msgfix = OneBotMessageUtil.fixMessage(event);
         log.info("接收 <- 私聊 [{}({})] {}", friendNickname, friendId, msgfix);
-        
+
         // 获取该好友的对话上下文，如果不存在则创建新的
         String referenceKey = ChatContext.ChatType.PRIVATE.toString() + friendId;
         ChatContext chatContext = chatContexts.computeIfAbsent(referenceKey, k ->
-            ChatContext.builder()
-                    .chatId(friendId)
-                    .chatType(ChatContext.ChatType.PRIVATE)
-                    .build()
+                ChatContext.builder()
+                        .chatId(friendId)
+                        .chatType(ChatContext.ChatType.PRIVATE)
+                        .build()
         );
         // 调用连续对话方法
 //        String reply = arkDoubaoService.streamMultiChatWithDoubao(msgfix, chatContext.getMessages());

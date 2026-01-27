@@ -25,7 +25,7 @@ public class NapCatApiService {
 
     /**
      * 基础API服务
-     *  获取底层BaseApiService实例
+     * 获取底层BaseApiService实例
      */
     private final BaseApiService baseApiService;
 

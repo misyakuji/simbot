@@ -72,9 +72,9 @@ public class JsonUtils {
     /**
      * 将JSON字符串反序列化为对象
      *
-     * @param json JSON字符串
+     * @param json  JSON字符串
      * @param clazz 目标类
-     * @param <T> 目标类型
+     * @param <T>   目标类型
      * @return 目标对象
      */
     public static <T> T fromJson(String json, Class<T> clazz) {
@@ -92,9 +92,9 @@ public class JsonUtils {
     /**
      * 将JSON字符串反序列化为对象（带类型引用）
      *
-     * @param json JSON字符串
+     * @param json          JSON字符串
      * @param typeReference 类型引用
-     * @param <T> 目标类型
+     * @param <T>           目标类型
      * @return 目标对象
      */
     public static <T> T fromJson(String json, TypeReference<T> typeReference) {
@@ -116,16 +116,17 @@ public class JsonUtils {
      * @return Map对象
      */
     public static Map<String, Object> toMap(String json) {
-        return fromJson(json, new TypeReference<Map<String, Object>>() {});
+        return fromJson(json, new TypeReference<>() {
+        });
     }
 
     /**
      * 将对象转换为另一个对象
      *
-     * @param source 源对象
+     * @param source      源对象
      * @param targetClass 目标类
-     * @param <S> 源类型
-     * @param <T> 目标类型
+     * @param <S>         源类型
+     * @param <T>         目标类型
      * @return 目标对象
      */
     public static <S, T> T convertValue(S source, Class<T> targetClass) {

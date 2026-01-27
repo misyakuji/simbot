@@ -23,11 +23,11 @@ public enum NapCatApiEnum {
      * <p>向指定用户发送戳一戳操作</p>
      */
     SEND_POKE(
-        "/send_poke",
-        HttpMethod.POST,
-        "发送戳一戳操作",
-        SendPokeRequest.class,
-        SendPokeResponse.class
+            "/send_poke",
+            HttpMethod.POST,
+            "发送戳一戳操作",
+            SendPokeRequest.class,
+            SendPokeResponse.class
     ),
 
     /**
@@ -35,11 +35,11 @@ public enum NapCatApiEnum {
      * <p>撤回指定的消息</p>
      */
     DELETE_MSG(
-        "/delete_msg",
-        HttpMethod.POST,
-        "撤回指定消息",
-        DeleteMsgRequest.class,
-        DeleteMsgResponse.class
+            "/delete_msg",
+            HttpMethod.POST,
+            "撤回指定消息",
+            DeleteMsgRequest.class,
+            DeleteMsgResponse.class
     ),
 
     /**
@@ -47,11 +47,11 @@ public enum NapCatApiEnum {
      * <p>获取指定群组的历史消息记录</p>
      */
     GET_GROUP_MSG_HISTORY(
-        "/get_group_msg_history",
-        HttpMethod.GET,
-        "获取群组历史消息",
-        GetGroupMsgHistoryRequest.class,
-        GetGroupMsgHistoryResponse.class
+            "/get_group_msg_history",
+            HttpMethod.GET,
+            "获取群组历史消息",
+            GetGroupMsgHistoryRequest.class,
+            GetGroupMsgHistoryResponse.class
     ),
 
     /**
@@ -59,11 +59,11 @@ public enum NapCatApiEnum {
      * <p>根据消息ID获取消息的详细信息</p>
      */
     GET_MSG(
-        "/get_msg",
-        HttpMethod.GET,
-        "获取消息详情",
-        GetMsgRequest.class,
-        GetMsgResponse.class
+            "/get_msg",
+            HttpMethod.GET,
+            "获取消息详情",
+            GetMsgRequest.class,
+            GetMsgResponse.class
     ),
 
     /**
@@ -71,11 +71,11 @@ public enum NapCatApiEnum {
      * <p>获取合并转发消息的详细内容</p>
      */
     GET_FORWARD_MSG(
-        "/get_forward_msg",
-        HttpMethod.GET,
-        "获取合并转发消息",
-        GetForwardMsgRequest.class,
-        GetForwardMsgResponse.class
+            "/get_forward_msg",
+            HttpMethod.GET,
+            "获取合并转发消息",
+            GetForwardMsgRequest.class,
+            GetForwardMsgResponse.class
     ),
 
     /**
@@ -83,11 +83,11 @@ public enum NapCatApiEnum {
      * <p>为消息添加表情反应</p>
      */
     SET_MSG_EMOJI_LIKE(
-        "/set_msg_emoji_like",
-        HttpMethod.POST,
-        "为消息贴表情",
-        SetMsgEmojiLikeRequest.class,
-        SetMsgEmojiLikeResponse.class
+            "/set_msg_emoji_like",
+            HttpMethod.POST,
+            "为消息贴表情",
+            SetMsgEmojiLikeRequest.class,
+            SetMsgEmojiLikeResponse.class
     ),
 
     /**
@@ -95,11 +95,11 @@ public enum NapCatApiEnum {
      * <p>获取与指定好友的历史消息记录</p>
      */
     GET_FRIEND_MSG_HISTORY(
-        "/get_friend_msg_history",
-        HttpMethod.GET,
-        "获取好友历史消息",
-        GetFriendMsgHistoryRequest.class,
-        GetFriendMsgHistoryResponse.class
+            "/get_friend_msg_history",
+            HttpMethod.GET,
+            "获取好友历史消息",
+            GetFriendMsgHistoryRequest.class,
+            GetFriendMsgHistoryResponse.class
     ),
 
     /**
@@ -107,11 +107,11 @@ public enum NapCatApiEnum {
      * <p>获取消息的表情反应详情</p>
      */
     FETCH_EMOJI_LIKE(
-        "/fetch_emoji_like",
-        HttpMethod.GET,
-        "获取消息表情详情",
-        FetchEmojiLikeRequest.class,
-        FetchEmojiLikeResponse.class
+            "/fetch_emoji_like",
+            HttpMethod.GET,
+            "获取消息表情详情",
+            FetchEmojiLikeRequest.class,
+            FetchEmojiLikeResponse.class
     ),
 
     /**
@@ -119,11 +119,11 @@ public enum NapCatApiEnum {
      * <p>发送合并转发的消息</p>
      */
     SEND_FORWARD_MSG(
-        "/send_forward_msg",
-        HttpMethod.POST,
-        "发送合并转发消息",
-        SendForwardMsgRequest.class,
-        SendForwardMsgResponse.class
+            "/send_forward_msg",
+            HttpMethod.POST,
+            "发送合并转发消息",
+            SendForwardMsgRequest.class,
+            SendForwardMsgResponse.class
     ),
 
     /**
@@ -131,11 +131,11 @@ public enum NapCatApiEnum {
      * <p>获取语音消息的详细信息</p>
      */
     GET_RECORD(
-        "/get_record",
-        HttpMethod.GET,
-        "获取语音消息详情",
-        GetRecordRequest.class,
-        GetRecordResponse.class
+            "/get_record",
+            HttpMethod.GET,
+            "获取语音消息详情",
+            GetRecordRequest.class,
+            GetRecordResponse.class
     ),
 
     /**
@@ -143,11 +143,11 @@ public enum NapCatApiEnum {
      * <p>获取图片消息的详细信息</p>
      */
     GET_IMAGE(
-        "/get_image",
-        HttpMethod.GET,
-        "获取图片消息详情",
-        GetImageRequest.class,
-        GetImageResponse.class
+            "/get_image",
+            HttpMethod.GET,
+            "获取图片消息详情",
+            GetImageRequest.class,
+            GetImageResponse.class
     ),
 
     /**
@@ -155,11 +155,11 @@ public enum NapCatApiEnum {
      * <p>向群组发送AI生成的语音消息</p>
      */
     SEND_GROUP_AI_RECORD(
-        "/send_group_ai_record",
-        HttpMethod.POST,
-        "发送群AI语音",
-        SendGroupAiRecordRequest.class,
-        SendGroupAiRecordResponse.class
+            "/send_group_ai_record",
+            HttpMethod.POST,
+            "发送群AI语音",
+            SendGroupAiRecordRequest.class,
+            SendGroupAiRecordResponse.class
     ),
 
     /**
@@ -167,11 +167,11 @@ public enum NapCatApiEnum {
      * <p>向群组发送合并转发的消息</p>
      */
     SEND_GROUP_FORWARD_MSG(
-        "/send_group_forward_msg",
-        HttpMethod.POST,
-        "发送群合并转发消息",
-        SendGroupForwardMsgRequest.class,
-        SendGroupForwardMsgResponse.class
+            "/send_group_forward_msg",
+            HttpMethod.POST,
+            "发送群合并转发消息",
+            SendGroupForwardMsgRequest.class,
+            SendGroupForwardMsgResponse.class
     ),
 
     /**
@@ -179,11 +179,11 @@ public enum NapCatApiEnum {
      * <p>将消息转发到指定群组</p>
      */
     FORWARD_GROUP_SINGLE_MSG(
-        "/forward_group_single_msg",
-        HttpMethod.POST,
-        "消息转发到群",
-        ForwardGroupSingleMsgRequest.class,
-        ForwardGroupSingleMsgResponse.class
+            "/forward_group_single_msg",
+            HttpMethod.POST,
+            "消息转发到群",
+            ForwardGroupSingleMsgRequest.class,
+            ForwardGroupSingleMsgResponse.class
     ),
 
     /**
@@ -191,11 +191,11 @@ public enum NapCatApiEnum {
      * <p>在群聊中发送戳一戳操作</p>
      */
     GROUP_POKE(
-        "/group_poke",
-        HttpMethod.POST,
-        "发送群聊戳一戳",
-        GroupPokeRequest.class,
-        GroupPokeResponse.class
+            "/group_poke",
+            HttpMethod.POST,
+            "发送群聊戳一戳",
+            GroupPokeRequest.class,
+            GroupPokeResponse.class
     ),
 
     /**
@@ -203,11 +203,11 @@ public enum NapCatApiEnum {
      * <p>向私聊发送合并转发的消息</p>
      */
     SEND_PRIVATE_FORWARD_MSG(
-        "/send_private_forward_msg",
-        HttpMethod.POST,
-        "发送私聊合并转发消息",
-        SendPrivateForwardMsgRequest.class,
-        SendPrivateForwardMsgResponse.class
+            "/send_private_forward_msg",
+            HttpMethod.POST,
+            "发送私聊合并转发消息",
+            SendPrivateForwardMsgRequest.class,
+            SendPrivateForwardMsgResponse.class
     ),
 
     /**
@@ -215,11 +215,11 @@ public enum NapCatApiEnum {
      * <p>将消息转发到私聊</p>
      */
     FORWARD_FRIEND_SINGLE_MSG(
-        "/forward_friend_single_msg",
-        HttpMethod.POST,
-        "消息转发到私聊",
-        ForwardFriendSingleMsgRequest.class,
-        ForwardFriendSingleMsgResponse.class
+            "/forward_friend_single_msg",
+            HttpMethod.POST,
+            "消息转发到私聊",
+            ForwardFriendSingleMsgRequest.class,
+            ForwardFriendSingleMsgResponse.class
     ),
 
     /**
@@ -227,11 +227,11 @@ public enum NapCatApiEnum {
      * <p>在私聊中发送戳一戳操作</p>
      */
     FRIEND_POKE(
-        "/friend_poke",
-        HttpMethod.POST,
-        "发送私聊戳一戳",
-        FriendPokeRequest.class,
-        FriendPokeResponse.class
+            "/friend_poke",
+            HttpMethod.POST,
+            "发送私聊戳一戳",
+            FriendPokeRequest.class,
+            FriendPokeResponse.class
     ),
 
     /**
@@ -239,11 +239,11 @@ public enum NapCatApiEnum {
      * <p>向指定群组发送消息</p>
      */
     SEND_GROUP_MSG(
-        "/send_group_msg",
-        HttpMethod.POST,
-        "发送群消息",
-        SendGroupMsgRequest.class,
-        SendGroupMsgResponse.class
+            "/send_group_msg",
+            HttpMethod.POST,
+            "发送群消息",
+            SendGroupMsgRequest.class,
+            SendGroupMsgResponse.class
     ),
 
     /**
@@ -251,11 +251,11 @@ public enum NapCatApiEnum {
      * <p>向指定好友发送私聊消息</p>
      */
     SEND_PRIVATE_MSG(
-        "/send_private_msg",
-        HttpMethod.POST,
-        "发送私聊消息",
-        SendPrivateMsgRequest.class,
-        SendPrivateMsgResponse.class
+            "/send_private_msg",
+            HttpMethod.POST,
+            "发送私聊消息",
+            SendPrivateMsgRequest.class,
+            SendPrivateMsgResponse.class
     );
 
     /**
@@ -286,14 +286,14 @@ public enum NapCatApiEnum {
     /**
      * 构造函数
      *
-     * @param path API路径
-     * @param method HTTP请求方法
-     * @param description 功能描述
-     * @param requestClass 请求参数类
+     * @param path          API路径
+     * @param method        HTTP请求方法
+     * @param description   功能描述
+     * @param requestClass  请求参数类
      * @param responseClass 响应结果类
      */
-    NapCatApiEnum(String path, HttpMethod method, String description, 
-                   Class<?> requestClass, Class<?> responseClass) {
+    NapCatApiEnum(String path, HttpMethod method, String description,
+                  Class<?> requestClass, Class<?> responseClass) {
         this.path = path;
         this.method = method;
         this.description = description;
@@ -326,8 +326,8 @@ public enum NapCatApiEnum {
      */
     public static NapCatApiEnum[] getGetApis() {
         return java.util.Arrays.stream(values())
-            .filter(api -> api.method == HttpMethod.GET)
-            .toArray(NapCatApiEnum[]::new);
+                .filter(api -> api.method == HttpMethod.GET)
+                .toArray(NapCatApiEnum[]::new);
     }
 
     /**
@@ -337,14 +337,14 @@ public enum NapCatApiEnum {
      */
     public static NapCatApiEnum[] getPostApis() {
         return java.util.Arrays.stream(values())
-            .filter(api -> api.method == HttpMethod.POST)
-            .toArray(NapCatApiEnum[]::new);
+                .filter(api -> api.method == HttpMethod.POST)
+                .toArray(NapCatApiEnum[]::new);
     }
 
     @Override
     public String toString() {
         return String.format("NapCatApiEnum{path='%s', method=%s, description='%s', requestClass=%s, responseClass=%s}",
-            path, method, description, requestClass.getSimpleName(), responseClass.getSimpleName());
+                path, method, description, requestClass.getSimpleName(), responseClass.getSimpleName());
     }
 
 //    /**

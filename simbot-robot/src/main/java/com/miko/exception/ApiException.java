@@ -44,7 +44,7 @@ public class ApiException extends RuntimeException {
     /**
      * 构造函数（包含错误码和错误信息）
      *
-     * @param code 错误码
+     * @param code    错误码
      * @param message 错误信息
      */
     public ApiException(Integer code, String message) {
@@ -58,7 +58,7 @@ public class ApiException extends RuntimeException {
      * 构造函数（包含错误信息和原始异常）
      *
      * @param message 错误信息
-     * @param cause 原始异常
+     * @param cause   原始异常
      */
     public ApiException(String message, Throwable cause) {
         super(message, cause);
@@ -70,9 +70,9 @@ public class ApiException extends RuntimeException {
     /**
      * 构造函数（包含错误码、错误信息和原始异常）
      *
-     * @param code 错误码
+     * @param code    错误码
      * @param message 错误信息
-     * @param cause 原始异常
+     * @param cause   原始异常
      */
     public ApiException(Integer code, String message, Throwable cause) {
         super(message, cause);
@@ -84,9 +84,9 @@ public class ApiException extends RuntimeException {
     @Override
     public String toString() {
         return "ApiException{" +
-            "code=" + code +
-            ", message='" + message + '\'' +
-            ", cause=" + cause +
-            '}';
+                "code=" + code +
+                ", message='" + message + '\'' +
+                ", cause=" + cause +
+                '}';
     }
 }

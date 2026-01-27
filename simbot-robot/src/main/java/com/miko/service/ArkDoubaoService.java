@@ -41,6 +41,7 @@ public class ArkDoubaoService {
 
     /**
      * 核心业务方法:封装豆包API调用,对外提供对话能力
+     *
      * @param prompt 用户输入的提示词/问题
      * @return 豆包API返回的响应结果
      */
@@ -73,7 +74,8 @@ public class ArkDoubaoService {
 
     /**
      * 连续对话方法:支持上下文关联的对话
-     * @param prompt 用户输入的提示词/问题
+     *
+     * @param prompt      用户输入的提示词/问题
      * @param chatContext 上一次对话的响应ID,用于关联上下文
      * @return 豆包API返回的响应结果
      */
@@ -127,7 +129,7 @@ public class ArkDoubaoService {
             return extractReplyContent(response);
         } catch (Exception e) {
             log.error("豆包API连续对话调用失败,输入prompt:{}, previousResponseId:{}", prompt, chatContext.getMessageId(), e);
-            return streamChatWithDoubao("哎呀，程序异常了："+e.getMessage());
+            return streamChatWithDoubao("哎呀，程序异常了：" + e.getMessage());
             // throw new RuntimeException("调用豆包API连续对话异常,请检查网络或配置", e);
         }
     }
@@ -166,7 +168,8 @@ public class ArkDoubaoService {
 
     /**
      * 流式连续对话方法:支持上下文关联的流式对话
-     * @param prompt 用户输入的提示词/问题
+     *
+     * @param prompt           用户输入的提示词/问题
      * @param previousMessages 上一次对话的消息历史
      * @return 豆包API返回的流式响应结果
      */
@@ -217,6 +220,7 @@ public class ArkDoubaoService {
 
     /**
      * 查询指定对话的详细信息
+     *
      * @param responseId 对话响应ID
      * @return 对话详细信息
      */
@@ -245,6 +249,7 @@ public class ArkDoubaoService {
 
     /**
      * 获取指定对话的消息列表
+     *
      * @param responseId 对话响应ID
      * @return 对话消息列表
      */
@@ -274,6 +279,7 @@ public class ArkDoubaoService {
 
     /**
      * 关闭指定对话(删除对话)
+     *
      * @param responseId 对话响应ID
      * @return 关闭结果
      */

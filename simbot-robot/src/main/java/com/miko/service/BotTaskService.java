@@ -13,7 +13,7 @@ public class BotTaskService {
 
     private final BotTaskMapper botTaskMapper;
 
-    public List<BotTaskModel> getAllActive(){
+    public List<BotTaskModel> getAllActive() {
         return botTaskMapper.getAllActive();
     }
 }

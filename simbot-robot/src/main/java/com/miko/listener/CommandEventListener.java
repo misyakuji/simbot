@@ -141,36 +141,36 @@ public class CommandEventListener {
         try {
             // 获取对话上下文
             Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
-            
+
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
                 volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
                 return;
             }
-            
+
             // 格式化对话列表
             StringBuilder replyContent = new StringBuilder();
             replyContent.append("📋 当前对话列表：\n\n");
-            
+
             List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
             for (int i = 0; i < chatList.size(); i++) {
                 Map.Entry<String, ChatContext> entry = chatList.get(i);
                 String key = entry.getKey();
                 ChatContext context = entry.getValue();
-                
+
                 replyContent.append(String.format("%d. 对话ID：%s\n", i + 1, key));
                 replyContent.append(String.format("   聊天类型：%s\n", context.getChatType()));
                 replyContent.append(String.format("   聊天ID：%s\n", context.getChatId()));
                 replyContent.append(String.format("   消息数量：%d\n\n", context.getMessages() != null ? context.getMessages().size() : 0));
             }
-            
+
             // 发送回复
             event.getContent().sendAsync(replyContent.toString());
         } catch (Exception e) {
             log.error("查看对话列表失败", e);
             event.getContent().sendAsync("❌ 查看对话列表失败：" + e.getMessage());
         }
-        
+
         // 标记中断后续监听
         volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
     }
@@ -183,13 +183,13 @@ public class CommandEventListener {
     public void deleteChatCmdEvent(OneBotFriendMessageEvent event) {
         String cmd = Objects.requireNonNull(event.getMessageContent().getPlainText()).trim();
         Matcher matcher = Pattern.compile("^(?:/删除对话|/removeChat)(\\d+)$").matcher(cmd);
-        
+
         if (!matcher.find()) {
             event.getContent().sendAsync("❌ 指令格式错误！正确格式：/删除对话1 或 /removeChat1");
             volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
             return;
         }
-        
+
         int chatIndex;
         try {
             chatIndex = Integer.parseInt(matcher.group(1)); // 提取对话序号
@@ -198,35 +198,35 @@ public class CommandEventListener {
             volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
             return;
         }
-        
+
         try {
             // 获取对话上下文
             Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
-            
+
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
                 volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
                 return;
             }
-            
+
             List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
-            
+
             if (chatIndex < 1 || chatIndex > chatList.size()) {
                 String tip = String.format("❌ 对话序号超出范围！当前共有 %d 个对话", chatList.size());
                 event.getContent().sendAsync(tip);
                 volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
                 return;
             }
-            
+
             // 删除指定序号的对话
             Map.Entry<String, ChatContext> entryToRemove = chatList.get(chatIndex - 1);
             String removedKey = entryToRemove.getKey();
             ChatContext removedContext = entryToRemove.getValue();
-            
+
             // 从上下文Map中删除
             removeChatContextFromMessageEventListener(removedKey);
-            
-            String successMsg = String.format("✅ 成功删除对话！\n对话ID：%s\n聊天类型：%s\n聊天ID：%s", 
+
+            String successMsg = String.format("✅ 成功删除对话！\n对话ID：%s\n聊天类型：%s\n聊天ID：%s",
                     removedKey, removedContext.getChatType(), removedContext.getChatId());
             event.getContent().sendAsync(successMsg);
             log.info("用户删除对话：{}", removedKey);
@@ -234,7 +234,7 @@ public class CommandEventListener {
             log.error("删除对话失败", e);
             event.getContent().sendAsync("❌ 删除对话失败：" + e.getMessage());
         }
-        
+
         // 标记中断后续监听
         volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
     }

@@ -1,6 +1,9 @@
 package com.miko.util;
 
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -18,12 +21,12 @@ public class SSHExecUtil implements AutoCloseable {
     private static final int DEFAULT_SSH_PORT = 22;
     private static final int DEFAULT_CONNECT_TIMEOUT = 30000;
 
-    private String host;
-    private int port;
-    private String username;
-    private String password;
+    private final String host;
+    private final int port;
+    private final String username;
+    private final String password;
 
-    private JSch jsch;
+    private final JSch jsch;
     private Session session;
     private volatile boolean isConnected = false;
 
@@ -117,7 +120,7 @@ public class SSHExecUtil implements AutoCloseable {
             String output = result.toString().trim();
             log.info("命令执行完成，耗时：{}ms，退出状态：{}", elapsed, exitStatus);
 
-            if (errorResult.length() > 0) {
+            if (!errorResult.isEmpty()) {
                 log.warn("命令错误输出：{}", errorResult);
             }
 

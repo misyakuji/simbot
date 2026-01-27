@@ -1,4 +1,5 @@
 package com.miko.util;
+
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -42,23 +43,23 @@ public class SSHUtil implements AutoCloseable {
     });
 
     // SSH连接核心参数
-    private String host;
-    private int port;
-    private String username;
-    private String password;
-    private String privateKeyPath;
+    private final String host;
+    private final int port;
+    private final String username;
+    private final String password;
+    private final String privateKeyPath;
 
     // 超时/重试配置
-    private int idleTimeoutSeconds;
-    private int connectTimeout;
-    private int connectRetryTimes;
+    private final int idleTimeoutSeconds;
+    private final int connectTimeout;
+    private final int connectRetryTimes;
 
     // 空闲超时变量
     private final AtomicLong lastOperateTime = new AtomicLong(System.currentTimeMillis());
     private volatile boolean idleCheckScheduled = false;
 
     // Shell通道相关（核心：保持会话上下文）
-    private JSch jsch;
+    private final JSch jsch;
     private Session session;
     private ChannelShell channelShell;
     private OutputStream shellOutput; // 向shell写入命令
@@ -207,6 +208,7 @@ public class SSHUtil implements AutoCloseable {
 
     /**
      * 执行单个命令（核心：Shell通道执行，保持上下文）
+     *
      * @param command 要执行的命令
      */
     public String executeCommand(String command) throws IOException {

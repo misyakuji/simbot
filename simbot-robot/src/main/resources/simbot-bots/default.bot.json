@@ -3,6 +3,6 @@
   "authorization": {
     "botUniqueId": "759901093",
     "apiServerHost": "http://localhost:3000",
-    "eventServerHost":"ws://localhost:3001"
+    "eventServerHost": "ws://localhost:3001"
   }
 }

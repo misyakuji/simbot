@@ -32,7 +32,7 @@ import java.util.List;
 public class BotScheduledTask {
 
     private final SimBotConfig simBotConfig;
-    
+
     private final BotTaskService botTaskService;
 
     private final Application application;
@@ -53,7 +53,7 @@ public class BotScheduledTask {
                     getBot().executeAsync(SendGroupMsgApi.create(Identifies.of(task.getTargetId()),
                             OneBotMessageOutgoing.create(task.getContent())));
 
-                } else if ("1".equals(task.getTargetType())){
+                } else if ("1".equals(task.getTargetType())) {
                     getBot().executeAsync(SendPrivateMsgApi.create(Identifies.of(task.getTargetId()),
                             OneBotMessageOutgoing.create(task.getContent())));
 
@@ -78,16 +78,12 @@ public class BotScheduledTask {
             OneBotBot bot = getBot();
             assert bot != null;
             String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            final String msg = currentTime +" hello";
+            final String msg = currentTime + " hello";
             var defaultGroups = new String[]{"710117186", "710117186"};
             Arrays.stream(defaultGroups).forEach(id -> {
                 val group = Identifies.of(id);
                 log.info("正在发送定时任务,group={}, msg={}", id, msg);
-                if (group != null) {
-                    bot.executeAsync(SendGroupMsgApi.create(group, OneBotMessageOutgoing.create(msg)));
-                } else {
-                    log.info("消息发送失败，group={}, msg={}", id, msg);
-                }
+                bot.executeAsync(SendGroupMsgApi.create(group, OneBotMessageOutgoing.create(msg)));
             });
         } catch (Exception e) {
             log.error("定时任务发送异常!", e);

@@ -23,6 +23,7 @@ import java.util.Objects;
 public class NapCatEventListener {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
     @Listener
     public void handle(Event event) {
         log.debug("{}", event);
@@ -35,7 +36,7 @@ public class NapCatEventListener {
         ID groupId = Identifies.of(710117186);
         String currentTime = LocalDateTime.now().format(DATE_TIME_FORMATTER);
         log.info("Bot[{}:{}]启动成功~", event.getBot().getName(), event.getBot().getId());
-        event.getBot().executeAsync(SendPrivateMsgApi.create(masterId,OneBotMessageOutgoing.create(String.format("[%s] 本宝闪亮登场~", currentTime))));
+        event.getBot().executeAsync(SendPrivateMsgApi.create(masterId, OneBotMessageOutgoing.create(String.format("[%s] 本宝闪亮登场~", currentTime))));
         // event.getBot().executeAsync(SendGroupMsgApi.create(groupId,OneBotMessageOutgoing.create("本宝闪亮登场~")));
     }
 

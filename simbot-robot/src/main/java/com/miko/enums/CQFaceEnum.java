@@ -198,7 +198,8 @@ public enum CQFaceEnum {
 
     /**
      * 枚举构造方法
-     * @param faceId CQ表情id
+     *
+     * @param faceId   CQ表情id
      * @param faceText 表情文本（可为null）
      */
     CQFaceEnum(Integer faceId, String faceText) {
@@ -208,6 +209,7 @@ public enum CQFaceEnum {
 
     /**
      * 根据faceId获取枚举实例
+     *
      * @param faceId CQ表情id（可为null）
      * @return 对应枚举实例，无匹配则返回UNKNOWN
      */
@@ -225,6 +227,7 @@ public enum CQFaceEnum {
 
     /**
      * 新增：判断表情是否为UNKNOWN（未知）或不存在
+     *
      * @param faceId CQ表情id（可为null）
      * @return true=有效表情；false=未知/不存在
      */
@@ -234,6 +237,7 @@ public enum CQFaceEnum {
 
     /**
      * 对外提供：根据faceId获取对应的faceText
+     *
      * @param faceId CQ表情id
      * @return 表情文本，无匹配则返回"未知表情"
      */

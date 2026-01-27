@@ -48,125 +48,125 @@ public class BaseApiService {
      *
      * @param apiEnum API枚举
      * @param request 请求对象
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>     请求类型
+     * @param <R>     响应类型
      * @return 响应对象
      */
     public <T, R> R callApi(NapCatApiEnum apiEnum, T request, Class<R> responseClass) {
         return callApi(
-            apiEnum.getMethod(),
-            apiEnum.getPath(),
-            request,
-            responseClass,
-            null,
-            null,
-            DEFAULT_TIMEOUT_SECONDS
+                apiEnum.getMethod(),
+                apiEnum.getPath(),
+                request,
+                responseClass,
+                null,
+                null,
+                DEFAULT_TIMEOUT_SECONDS
         );
     }
 
     /**
      * 调用API（根据API枚举，带超时配置）
      *
-     * @param apiEnum API枚举
-     * @param request 请求对象
-     * @param responseClass 响应类
+     * @param apiEnum        API枚举
+     * @param request        请求对象
+     * @param responseClass  响应类
      * @param timeoutSeconds 超时时间（秒）
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>            请求类型
+     * @param <R>            响应类型
      * @return 响应对象
      */
     public <T, R> R callApi(NapCatApiEnum apiEnum, T request, Class<R> responseClass, int timeoutSeconds) {
         return callApi(
-            apiEnum.getMethod(),
-            apiEnum.getPath(),
-            request,
-            responseClass,
-            null,
-            null,
-            timeoutSeconds
+                apiEnum.getMethod(),
+                apiEnum.getPath(),
+                request,
+                responseClass,
+                null,
+                null,
+                timeoutSeconds
         );
     }
 
     /**
      * 调用API（根据API枚举，带请求头）
      *
-     * @param apiEnum API枚举
-     * @param request 请求对象
+     * @param apiEnum       API枚举
+     * @param request       请求对象
      * @param responseClass 响应类
-     * @param headers 请求头
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param headers       请求头
+     * @param <T>           请求类型
+     * @param <R>           响应类型
      * @return 响应对象
      */
     public <T, R> R callApiWithHeaders(NapCatApiEnum apiEnum, T request, Class<R> responseClass,
                                        Map<String, String> headers) {
         return callApi(
-            apiEnum.getMethod(),
-            apiEnum.getPath(),
-            request,
-            responseClass,
-            headers,
-            null,
-            DEFAULT_TIMEOUT_SECONDS
+                apiEnum.getMethod(),
+                apiEnum.getPath(),
+                request,
+                responseClass,
+                headers,
+                null,
+                DEFAULT_TIMEOUT_SECONDS
         );
     }
 
     /**
      * 调用API（根据API枚举，带查询参数）
      *
-     * @param apiEnum API枚举
-     * @param request 请求对象
+     * @param apiEnum       API枚举
+     * @param request       请求对象
      * @param responseClass 响应类
-     * @param queryParams 查询参数
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param queryParams   查询参数
+     * @param <T>           请求类型
+     * @param <R>           响应类型
      * @return 响应对象
      */
     public <T, R> R callApiWithQueryParams(NapCatApiEnum apiEnum, T request, Class<R> responseClass,
                                            Map<String, String> queryParams) {
         return callApi(
-            apiEnum.getMethod(),
-            apiEnum.getPath(),
-            request,
-            responseClass,
-            null,
-            queryParams,
-            DEFAULT_TIMEOUT_SECONDS
+                apiEnum.getMethod(),
+                apiEnum.getPath(),
+                request,
+                responseClass,
+                null,
+                queryParams,
+                DEFAULT_TIMEOUT_SECONDS
         );
     }
 
     /**
      * 调用API（通用方法）
      *
-     * @param method HTTP方法
-     * @param path API路径
-     * @param request 请求对象
-     * @param responseClass 响应类
-     * @param headers 自定义头信息
-     * @param queryParams 查询参数
+     * @param method         HTTP方法
+     * @param path           API路径
+     * @param request        请求对象
+     * @param responseClass  响应类
+     * @param headers        自定义头信息
+     * @param queryParams    查询参数
      * @param timeoutSeconds 超时时间（秒）
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>            请求类型
+     * @param <R>            响应类型
      * @return 响应对象
      */
     public <T, R> R callApi(HttpMethod method, String path, T request, Class<R> responseClass,
-                          Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
+                            Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
         try {
             log.info("调用API - 方法: {}, 路径: {}, 请求: {}", method, path, JsonUtils.toJson(request));
 
             // 构建WebClient请求
             WebClient.RequestBodySpec requestSpec = webClient
-                .method(method)
-                .uri(uriBuilder -> {
-                    String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;
-                    uriBuilder.path(fullPath);
-                    if (queryParams != null && !queryParams.isEmpty()) {
-                        queryParams.forEach(uriBuilder::queryParam);
-                    }
-                    return uriBuilder.build();
-                })
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON);
+                    .method(method)
+                    .uri(uriBuilder -> {
+                        String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;
+                        uriBuilder.path(fullPath);
+                        if (queryParams != null && !queryParams.isEmpty()) {
+                            queryParams.forEach(uriBuilder::queryParam);
+                        }
+                        return uriBuilder.build();
+                    })
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON);
 
             // 添加自定义头信息
             if (headers != null && !headers.isEmpty()) {
@@ -180,8 +180,8 @@ public class BaseApiService {
 
             // 执行请求并设置超时
             Mono<String> responseMono = requestSpec.retrieve()
-                .bodyToMono(String.class)
-                .timeout(Duration.ofSeconds(timeoutSeconds));
+                    .bodyToMono(String.class)
+                    .timeout(Duration.ofSeconds(timeoutSeconds));
 
             // 获取响应
             String responseBody = responseMono.block();
@@ -193,17 +193,17 @@ public class BaseApiService {
 
         } catch (WebClientResponseException e) {
             log.error("API调用失败 - 方法: {}, 路径: {}, 状态码: {}, 响应: {}",
-                method, path, e.getStatusCode(), e.getResponseBodyAsString(), e);
+                    method, path, e.getStatusCode(), e.getResponseBodyAsString(), e);
             throw new ApiException(
-                e.getStatusCode().value(),
-                "API调用失败: " + e.getMessage(),
-                e
+                    e.getStatusCode().value(),
+                    "API调用失败: " + e.getMessage(),
+                    e
             );
         } catch (Exception e) {
             log.error("API调用异常 - 方法: {}, 路径: {}, 异常: {}", method, path, e.getMessage(), e);
             throw new ApiException(
-                "API调用异常: " + e.getMessage(),
-                e
+                    "API调用异常: " + e.getMessage(),
+                    e
             );
         }
     }
@@ -211,12 +211,12 @@ public class BaseApiService {
     /**
      * 异步调用API
      *
-     * @param method HTTP方法
-     * @param path API路径
-     * @param request 请求对象
+     * @param method        HTTP方法
+     * @param path          API路径
+     * @param request       请求对象
      * @param responseClass 响应类
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>           请求类型
+     * @param <R>           响应类型
      * @return 响应对象Mono
      */
     public <T, R> Mono<R> callApiAsync(HttpMethod method, String path, T request, Class<R> responseClass) {
@@ -226,35 +226,35 @@ public class BaseApiService {
     /**
      * 异步调用API（带完整配置）
      *
-     * @param method HTTP方法
-     * @param path API路径
-     * @param request 请求对象
-     * @param responseClass 响应类
-     * @param headers 自定义头信息
-     * @param queryParams 查询参数
+     * @param method         HTTP方法
+     * @param path           API路径
+     * @param request        请求对象
+     * @param responseClass  响应类
+     * @param headers        自定义头信息
+     * @param queryParams    查询参数
      * @param timeoutSeconds 超时时间（秒）
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>            请求类型
+     * @param <R>            响应类型
      * @return 响应对象Mono
      */
     public <T, R> Mono<R> callApiAsync(HttpMethod method, String path, T request, Class<R> responseClass,
-                                     Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
+                                       Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
         try {
             log.info("异步调用API - 方法: {}, 路径: {}, 请求: {}", method, path, JsonUtils.toJson(request));
 
             // 构建WebClient请求
             WebClient.RequestBodySpec requestSpec = webClient
-                .method(method)
-                .uri(uriBuilder -> {
-                    String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;
-                    uriBuilder.path(fullPath);
-                    if (queryParams != null && !queryParams.isEmpty()) {
-                        queryParams.forEach(uriBuilder::queryParam);
-                    }
-                    return uriBuilder.build();
-                })
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON);
+                    .method(method)
+                    .uri(uriBuilder -> {
+                        String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;
+                        uriBuilder.path(fullPath);
+                        if (queryParams != null && !queryParams.isEmpty()) {
+                            queryParams.forEach(uriBuilder::queryParam);
+                        }
+                        return uriBuilder.build();
+                    })
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON);
 
             // 添加自定义头信息
             if (headers != null && !headers.isEmpty()) {
@@ -268,34 +268,34 @@ public class BaseApiService {
 
             // 执行请求并设置超时
             return requestSpec.retrieve()
-                .bodyToMono(String.class)
-                .timeout(Duration.ofSeconds(timeoutSeconds))
-                .map(responseBody -> {
-                    log.info("异步API响应 - 方法: {}, 路径: {}, 响应: {}", method, path, responseBody);
-                    return JsonUtils.fromJson(responseBody, responseClass);
-                })
-                .onErrorMap(WebClientResponseException.class, e -> {
-                    log.error("异步API调用失败 - 方法: {}, 路径: {}, 状态码: {}, 响应: {}",
-                        method, path, e.getStatusCode(), e.getResponseBodyAsString(), e);
-                    return new ApiException(
-                        e.getStatusCode().value(),
-                        "API调用失败: " + e.getMessage(),
-                        e
-                    );
-                })
-                .onErrorMap(Exception.class, e -> {
-                    log.error("异步API调用异常 - 方法: {}, 路径: {}, 异常: {}", method, path, e.getMessage(), e);
-                    return new ApiException(
-                        "API调用异常: " + e.getMessage(),
-                        e
-                    );
-                });
+                    .bodyToMono(String.class)
+                    .timeout(Duration.ofSeconds(timeoutSeconds))
+                    .map(responseBody -> {
+                        log.info("异步API响应 - 方法: {}, 路径: {}, 响应: {}", method, path, responseBody);
+                        return JsonUtils.fromJson(responseBody, responseClass);
+                    })
+                    .onErrorMap(WebClientResponseException.class, e -> {
+                        log.error("异步API调用失败 - 方法: {}, 路径: {}, 状态码: {}, 响应: {}",
+                                method, path, e.getStatusCode(), e.getResponseBodyAsString(), e);
+                        return new ApiException(
+                                e.getStatusCode().value(),
+                                "API调用失败: " + e.getMessage(),
+                                e
+                        );
+                    })
+                    .onErrorMap(Exception.class, e -> {
+                        log.error("异步API调用异常 - 方法: {}, 路径: {}, 异常: {}", method, path, e.getMessage(), e);
+                        return new ApiException(
+                                "API调用异常: " + e.getMessage(),
+                                e
+                        );
+                    });
 
         } catch (Exception e) {
             log.error("异步API调用配置错误 - 方法: {}, 路径: {}, 异常: {}", method, path, e.getMessage(), e);
             return Mono.error(new ApiException(
-                "异步API调用配置错误: " + e.getMessage(),
-                e
+                    "异步API调用配置错误: " + e.getMessage(),
+                    e
             ));
         }
     }
@@ -303,9 +303,9 @@ public class BaseApiService {
     /**
      * GET请求
      *
-     * @param path API路径
+     * @param path          API路径
      * @param responseClass 响应类
-     * @param <R> 响应类型
+     * @param <R>           响应类型
      * @return 响应对象
      */
     public <R> R get(String path, Class<R> responseClass) {
@@ -315,10 +315,10 @@ public class BaseApiService {
     /**
      * GET请求（带查询参数）
      *
-     * @param path API路径
-     * @param queryParams 查询参数
+     * @param path          API路径
+     * @param queryParams   查询参数
      * @param responseClass 响应类
-     * @param <R> 响应类型
+     * @param <R>           响应类型
      * @return 响应对象
      */
     public <R> R get(String path, Map<String, String> queryParams, Class<R> responseClass) {
@@ -328,11 +328,11 @@ public class BaseApiService {
     /**
      * POST请求
      *
-     * @param path API路径
-     * @param request 请求对象
+     * @param path          API路径
+     * @param request       请求对象
      * @param responseClass 响应类
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>           请求类型
+     * @param <R>           响应类型
      * @return 响应对象
      */
     public <T, R> R post(String path, T request, Class<R> responseClass) {
@@ -342,11 +342,11 @@ public class BaseApiService {
     /**
      * PUT请求
      *
-     * @param path API路径
-     * @param request 请求对象
+     * @param path          API路径
+     * @param request       请求对象
      * @param responseClass 响应类
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>           请求类型
+     * @param <R>           响应类型
      * @return 响应对象
      */
     public <T, R> R put(String path, T request, Class<R> responseClass) {
@@ -356,11 +356,11 @@ public class BaseApiService {
     /**
      * DELETE请求
      *
-     * @param path API路径
-     * @param request 请求对象
+     * @param path          API路径
+     * @param request       请求对象
      * @param responseClass 响应类
-     * @param <T> 请求类型
-     * @param <R> 响应类型
+     * @param <T>           请求类型
+     * @param <R>           响应类型
      * @return 响应对象
      */
     public <T, R> R delete(String path, T request, Class<R> responseClass) {

@@ -13,6 +13,7 @@ public class OneBotMessageUtil {
 
     /**
      * 消息整合
+     *
      * @param event OneBot消息事件对象
      * @return 整合后的消息字符串
      */
@@ -32,7 +33,7 @@ public class OneBotMessageUtil {
             } else if (msg instanceof OneBotImage image) {
                 msgfix.append("img[").append(image.getData().getUrl()).append("]");
             } else if (msg instanceof OneBotFace face) {
-                if (CQFaceEnum.isExist(face.getData().getId())){
+                if (CQFaceEnum.isExist(face.getData().getId())) {
                     msgfix.append("face[").append(CQFaceEnum.getFaceTextByID(face.getData().getId())).append("]");
                 }
             } else if (msg instanceof OneBotJson json) {
