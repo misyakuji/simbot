@@ -9,7 +9,7 @@ import love.forte.simbot.component.onebot.v11.message.segment.*;
 
 import java.util.Objects;
 
-public class OneBotUtil {
+public class OneBotMessageUtil {
 
     /**
      * 消息整合

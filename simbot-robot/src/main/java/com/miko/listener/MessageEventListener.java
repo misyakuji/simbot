@@ -4,7 +4,7 @@ package com.miko.listener;
 import com.miko.config.VolcArkConfig;
 import com.miko.entity.ChatContext;
 import com.miko.service.ArkDoubaoService;
-import com.miko.util.OneBotUtil;
+import com.miko.util.OneBotMessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import love.forte.simbot.common.PriorityConstant;
@@ -60,7 +60,7 @@ public class MessageEventListener {
             groupMemberNickname = Objects.requireNonNull(event.getContent().getMember(groupMemberId)).getName();
         }
         // 消息内容
-        String msgfix = OneBotUtil.fixMessage(event);
+        String msgfix = OneBotMessageUtil.fixMessage(event);
         log.info("接收 <- 群聊 [{}({})] [{}({})] {}", groupNickname, groupId, groupMemberNickname, groupMemberId, msgfix);
     }
 
@@ -81,7 +81,7 @@ public class MessageEventListener {
         // 群ID
         String groupId = event.getContent().getId().toString();
         // 消息内容
-        String msgfix = OneBotUtil.fixMessage(event);
+        String msgfix = OneBotMessageUtil.fixMessage(event);
         
         // 获取该群的对话上下文，如果不存在则创建新的
         String referenceKey = ChatContext.ChatType.PRIVATE.toString() + groupId;
@@ -113,7 +113,7 @@ public class MessageEventListener {
         // 好友昵称
         String friendNickname = event.getSourceEvent().getSender().getNickname();
         // 消息内容
-        String msgfix = OneBotUtil.fixMessage(event);
+        String msgfix = OneBotMessageUtil.fixMessage(event);
         log.info("接收 <- 私聊 [{}({})] {}", friendNickname, friendId, msgfix);
         
         // 获取该好友的对话上下文，如果不存在则创建新的
