@@ -151,13 +151,13 @@ public class BaseApiService {
                             Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
         try {
             log.info("调用API - 方法: {}, 路径: {}, 请求: {}", method, path, JsonUtils.toJson(request));
-
+            WebClient webClient1 = webClient.mutate().baseUrl(simBotConfig.getAuthorization().getApiServerHost()).build();//todo
             // 构建WebClient请求
-            WebClient.RequestBodySpec requestSpec = webClient
+            WebClient.RequestBodySpec requestSpec = webClient1
                     .method(method)
                     .uri(uriBuilder -> {
-                        String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;
-                        uriBuilder.path(fullPath);
+                        String fullPath = simBotConfig.getAuthorization().getApiServerHost() + path;//todo
+                        uriBuilder.path(path);
                         if (queryParams != null && !queryParams.isEmpty()) {
                             queryParams.forEach(uriBuilder::queryParam);
                         }
