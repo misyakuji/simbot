@@ -2,6 +2,8 @@ package com.miko.listener;
 
 import com.miko.config.VolcArkConfig;
 import com.miko.entity.ChatContext;
+import com.miko.entity.napcat.response.GetFriendsWithCategoryResponse;
+import com.miko.service.NapCatApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotFriendMessageEvent;
@@ -26,6 +28,7 @@ public class CommandEventListener {
 
     private final VolcArkConfig volcArkConfig;
     private final MessageEventListener messageEventListener;
+    private final NapCatApiService napCatApiService;
 
     @Listener
     @Filter("/模型列表")
@@ -233,6 +236,55 @@ public class CommandEventListener {
         } catch (Exception e) {
             log.error("删除对话失败", e);
             event.getContent().sendAsync("❌ 删除对话失败：" + e.getMessage());
+        }
+
+        // 标记中断后续监听
+        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+    }
+
+    @Listener
+    @Filter("/好友列表")
+    public void friendsListCmdEvent(OneBotFriendMessageEvent event) {
+        try {
+            // 调用API获取好友列表
+            GetFriendsWithCategoryResponse response = napCatApiService.getFriendsWithCategory();
+            
+            if (response == null || response.getData() == null || response.getData().isEmpty()) {
+                event.getContent().sendAsync("📋 当前没有好友数据");
+                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                return;
+            }
+
+            // 格式化好友列表
+            StringBuilder replyContent = new StringBuilder();
+            replyContent.append("📋 好友列表\n\n");
+            
+            for (GetFriendsWithCategoryResponse.FriendCategory category : response.getData()) {
+                replyContent.append(String.format("🏷️ %s (%d人，在线%d人)\n", 
+                        category.getCategoryName(), 
+                        category.getCategoryMbCount(), 
+                        category.getOnlineCount()));
+                
+                if (category.getBuddyList() != null && !category.getBuddyList().isEmpty()) {
+                    for (GetFriendsWithCategoryResponse.Friend friend : category.getBuddyList()) {
+                        String displayName = friend.getRemark() != null && !friend.getRemark().isEmpty() 
+                                ? friend.getRemark() 
+                                : friend.getNickname();
+                        replyContent.append(String.format("   %s (%d)\n", 
+                                displayName, 
+                                friend.getUser_id()));
+                    }
+                } else {
+                    replyContent.append("   该分类下没有好友\n");
+                }
+                replyContent.append("\n");
+            }
+
+            // 发送回复
+            event.getContent().sendAsync(replyContent.toString());
+        } catch (Exception e) {
+            log.error("获取好友列表失败", e);
+            event.getContent().sendAsync("❌ 获取好友列表失败：" + e.getMessage());
         }
 
         // 标记中断后续监听
