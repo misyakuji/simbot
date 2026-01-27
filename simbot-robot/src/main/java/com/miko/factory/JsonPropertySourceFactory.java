@@ -1,6 +1,7 @@
 package com.miko.factory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.support.EncodedResource;
@@ -19,7 +20,7 @@ public class JsonPropertySourceFactory implements PropertySourceFactory {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public PropertySource<?> createPropertySource(String name, EncodedResource resource)
+    public @NonNull PropertySource<?> createPropertySource(String name, EncodedResource resource)
             throws IOException {
 
         String sourceName = StringUtils.hasText(name) ? name :
