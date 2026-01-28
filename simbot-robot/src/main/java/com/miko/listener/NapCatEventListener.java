@@ -1,7 +1,5 @@
 package com.miko.listener;
 
-import com.miko.service.BotTaskService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import love.forte.simbot.common.id.Identifies;
 import love.forte.simbot.component.onebot.v11.core.api.OneBotMessageOutgoing;
