@@ -248,7 +248,7 @@ public class CommandEventListener {
         try {
             // 调用API获取好友列表
             GetFriendsWithCategoryResponse response = napCatApiService.getFriendsWithCategory();
-            
+
             if (response == null || response.getData() == null || response.getData().isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有好友数据");
                 volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
@@ -258,20 +258,20 @@ public class CommandEventListener {
             // 格式化好友列表
             StringBuilder replyContent = new StringBuilder();
             replyContent.append("📋 好友列表\n\n");
-            
+
             for (GetFriendsWithCategoryResponse.FriendCategory category : response.getData()) {
-                replyContent.append(String.format("🏷️ %s (%d人，在线%d人)\n", 
-                        category.getCategoryName(), 
-                        category.getCategoryMbCount(), 
+                replyContent.append(String.format("🏷️ %s (%d人，在线%d人)\n",
+                        category.getCategoryName(),
+                        category.getCategoryMbCount(),
                         category.getOnlineCount()));
-                
+
                 if (category.getBuddyList() != null && !category.getBuddyList().isEmpty()) {
                     for (GetFriendsWithCategoryResponse.Friend friend : category.getBuddyList()) {
-                        String displayName = friend.getRemark() != null && !friend.getRemark().isEmpty() 
-                                ? friend.getRemark() 
+                        String displayName = friend.getRemark() != null && !friend.getRemark().isEmpty()
+                                ? friend.getRemark()
                                 : friend.getNickname();
-                        replyContent.append(String.format("   %s (%d)\n", 
-                                displayName, 
+                        replyContent.append(String.format("   %s (%d)\n",
+                                displayName,
                                 friend.getUser_id()));
                     }
                 } else {
