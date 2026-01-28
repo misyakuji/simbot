@@ -1,6 +1,10 @@
 package com.miko.listener;
 
+import com.miko.entity.napcat.response.GetFriendsWithCategoryResponse;
+import com.miko.service.NapCatApiService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import love.forte.simbot.common.id.ID;
 import love.forte.simbot.common.id.Identifies;
 import love.forte.simbot.component.onebot.v11.core.api.OneBotMessageOutgoing;
 import love.forte.simbot.component.onebot.v11.core.api.SendGroupMsgApi;
@@ -14,13 +18,19 @@ import love.forte.simbot.quantcat.common.annotations.Listener;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class NapCatEventListener {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
+    private final NapCatApiService napCatApiService;
 
     @Listener
     public void handle(Event event) {
@@ -34,9 +44,29 @@ public class NapCatEventListener {
 //        bot.getGroupRelation().getGroups().collectAsync(
 //                bot, group -> group.sendAsync("本宝闪亮登场~")
 //        );
+        List<ID> masters = new ArrayList<>();
+        // 调用API获取好友列表并流式处理，一站式完成：查找特别关心分组→过滤非空好友→转换为ID集合
+        Optional.ofNullable(napCatApiService.getFriendsWithCategory())
+                // 提取data，空则终止流
+                .map(GetFriendsWithCategoryResponse::getData)
+                // 过滤出"特别关心"分组（精准匹配）
+                .stream()
+                .flatMap(List::stream)
+                .filter(category -> "特别关心".equals(category.getCategoryName()))
+                .findFirst()
+                // 提取好友列表，空则兜底为空集合（避免后续空判断）
+                .map(GetFriendsWithCategoryResponse.FriendCategory::getBuddyList)
+                .orElse(List.of())
+                // 过滤好友列表中的null元素（双重空安全）
+                .stream()
+                .filter(java.util.Objects::nonNull)
+                // 转换为ID并收集到目标列表
+                .map(friend -> Identifies.of(friend.getUser_id()))
+                .forEach(masters::add);
+        // 发送消息给特别关分组中的好友
         bot.getContactRelation().getContacts().collectAsync(
                 bot, friend -> {
-                    if (friend.getId().equals(Identifies.of(67252271))) {
+                    if (masters.contains(friend.getId())) {
                         friend.sendAsync("本宝闪亮登场~");
                     }
                 }
