@@ -243,6 +243,63 @@ public class CommandEventListener {
     }
 
     @Listener
+    @Filter("/特别关心列表")
+    @Filter("/特别关心")
+    public void specialCareListCmdEvent(OneBotFriendMessageEvent event) {
+        try {
+            // 调用API获取好友列表
+            GetFriendsWithCategoryResponse response = napCatApiService.getFriendsWithCategory();
+
+            if (response == null || response.getData() == null || response.getData().isEmpty()) {
+                event.getContent().sendAsync("📋 当前没有好友数据");
+                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                return;
+            }
+
+            // 查找特别关心分组
+            GetFriendsWithCategoryResponse.FriendCategory specialCareCategory = response.getData().stream()
+                    .filter(category -> "特别关心".equals(category.getCategoryName()))
+                    .findFirst()
+                    .orElse(null);
+
+            // 格式化特别关心列表
+            StringBuilder replyContent = new StringBuilder();
+            replyContent.append("💖 特别关心列表\n\n");
+
+            if (specialCareCategory != null) {
+                replyContent.append(String.format("🏷️ %s (%d人，在线%d人)\n",
+                        specialCareCategory.getCategoryName(),
+                        specialCareCategory.getCategoryMbCount(),
+                        specialCareCategory.getOnlineCount()));
+
+                if (specialCareCategory.getBuddyList() != null && !specialCareCategory.getBuddyList().isEmpty()) {
+                    for (GetFriendsWithCategoryResponse.Friend friend : specialCareCategory.getBuddyList()) {
+                        String displayName = friend.getRemark() != null && !friend.getRemark().isEmpty()
+                                ? friend.getRemark()
+                                : friend.getNickname();
+                        replyContent.append(String.format("   %s (%d)\n",
+                                displayName,
+                                friend.getUser_id()));
+                    }
+                } else {
+                    replyContent.append("   该分类下没有好友\n");
+                }
+            } else {
+                replyContent.append("   没有找到特别关心分组\n");
+            }
+
+            // 发送回复
+            event.getContent().sendAsync(replyContent.toString());
+        } catch (Exception e) {
+            log.error("获取特别关心列表失败", e);
+            event.getContent().sendAsync("❌ 获取特别关心列表失败：" + e.getMessage());
+        }
+
+        // 标记中断后续监听
+        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+    }
+
+    @Listener
     @Filter("/好友列表")
     public void friendsListCmdEvent(OneBotFriendMessageEvent event) {
         try {
