@@ -6,9 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import love.forte.simbot.application.Application;
 import love.forte.simbot.common.id.Identifies;
-import love.forte.simbot.component.onebot.v11.core.api.OneBotMessageOutgoing;
-import love.forte.simbot.component.onebot.v11.core.api.SendGroupMsgApi;
-import love.forte.simbot.component.onebot.v11.core.api.SendPrivateMsgApi;
 import love.forte.simbot.component.onebot.v11.core.bot.OneBotBot;
 import love.forte.simbot.component.onebot.v11.core.bot.OneBotBotManager;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,14 +40,13 @@ public class BotScheduledTask {
         try {
             final OneBotBot bot = getBot();
             botTaskService.getAllActive().forEach(task -> {
-                log.info("正在发送定时任务,target={}, msg={}", task.getTargetId(), task.getContent());
                 if ("0".equals(task.getTargetType())) {
                     // https://simbot.forte.love/component-onebot-v11-onebotbot.html#onebotbotgrouprelation
                     bot.getGroupRelation().getGroups().collectAsync(
                             bot, group -> {
                                 if (group.getId().equals(Identifies.of(task.getTargetId()))) {
-                                    bot.executeAsync(SendGroupMsgApi.create(group.getId(),
-                                            OneBotMessageOutgoing.create(task.getContent())));
+                                    group.sendAsync(task.getContent());
+                                    log.info("发送定时任务,group={}, msg={}", task.getTargetId(), task.getContent());
                                 }
                             }
                     );
@@ -58,10 +54,9 @@ public class BotScheduledTask {
                     // https://simbot.forte.love/component-onebot-v11-onebotbot.html#onebotbotfriendrelation
                     bot.getContactRelation().getContacts().collectAsync(
                             bot, friend -> {
-                                log.info("正在发送定时任务,friend={}, msg={}", friend.getId(), task.getContent());
                                 if (friend.getId().equals(Identifies.of(task.getTargetId()))) {
-                                    bot.executeAsync(SendPrivateMsgApi.create(friend.getId(),
-                                            OneBotMessageOutgoing.create(task.getContent())));
+                                    friend.sendAsync(task.getContent());
+                                    log.info("发送定时任务,friend={}, msg={}", friend.getId(), task.getContent());
                                 }
                             }
                     );
@@ -88,8 +83,8 @@ public class BotScheduledTask {
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年M月d日H时")));
             bot.getGroupRelation().getGroups().collectAsync(
                     bot, group -> {
-                        log.info("正在发送定时任务,group={}, msg={}", group.getId(), msg);
-                        bot.executeAsync(SendGroupMsgApi.create(group.getId(), OneBotMessageOutgoing.create(msg)));
+                        group.sendAsync(msg);
+                        log.info("发送定时任务,group={}, msg={}", group.getId(), msg);
                     }
             );
         } catch (Exception e) {

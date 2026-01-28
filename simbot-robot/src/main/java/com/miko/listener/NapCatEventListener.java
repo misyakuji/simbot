@@ -1,7 +1,8 @@
 package com.miko.listener;
 
+import com.miko.service.BotTaskService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import love.forte.simbot.common.id.ID;
 import love.forte.simbot.common.id.Identifies;
 import love.forte.simbot.component.onebot.v11.core.api.OneBotMessageOutgoing;
 import love.forte.simbot.component.onebot.v11.core.api.SendGroupMsgApi;
@@ -14,7 +15,6 @@ import love.forte.simbot.event.Event;
 import love.forte.simbot.quantcat.common.annotations.Listener;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
@@ -31,13 +31,18 @@ public class NapCatEventListener {
 
     @Listener
     public void handle(OneBotBotStartedEvent event) {
-
-        ID masterId = Identifies.of(67252271);
-        ID groupId = Identifies.of(710117186);
-        String currentTime = LocalDateTime.now().format(DATE_TIME_FORMATTER);
         log.info("Bot[{}:{}]启动成功~", event.getBot().getName(), event.getBot().getId());
-        event.getBot().executeAsync(SendPrivateMsgApi.create(masterId, OneBotMessageOutgoing.create(String.format("[%s] 本宝闪亮登场~", currentTime))));
-        // event.getBot().executeAsync(SendGroupMsgApi.create(groupId,OneBotMessageOutgoing.create("本宝闪亮登场~")));
+        love.forte.simbot.component.onebot.v11.core.bot.OneBotBot bot = event.getBot();
+//        bot.getGroupRelation().getGroups().collectAsync(
+//                bot, group -> group.sendAsync("本宝闪亮登场~")
+//        );
+        bot.getContactRelation().getContacts().collectAsync(
+                bot, friend -> {
+                    if (friend.getId().equals(Identifies.of(67252271))) {
+                        friend.sendAsync("本宝闪亮登场~");
+                    }
+                }
+        );
     }
 
     /**
