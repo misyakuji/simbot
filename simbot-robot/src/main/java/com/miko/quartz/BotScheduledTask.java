@@ -1,11 +1,9 @@
 package com.miko.quartz;
 
 import com.miko.config.SimBotConfig;
-import com.miko.entity.BotTaskModel;
 import com.miko.service.BotTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import love.forte.simbot.application.Application;
 import love.forte.simbot.common.id.Identifies;
 import love.forte.simbot.component.onebot.v11.core.api.OneBotMessageOutgoing;
@@ -18,9 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Bot定时任务
@@ -45,17 +41,30 @@ public class BotScheduledTask {
     @Scheduled(cron = "0 0 8 * * ?")
     public void goodMorning() {
         try {
-            List<BotTaskModel> allTask = botTaskService.getAllActive();
-            log.info("正在发送定时任务 List={}", allTask);
-            allTask.forEach(task -> {
+            final OneBotBot bot = getBot();
+            botTaskService.getAllActive().forEach(task -> {
+                log.info("正在发送定时任务,target={}, msg={}", task.getTargetId(), task.getContent());
                 if ("0".equals(task.getTargetType())) {
-                    getBot().executeAsync(SendGroupMsgApi.create(Identifies.of(task.getTargetId()),
-                            OneBotMessageOutgoing.create(task.getContent())));
-
+                    // https://simbot.forte.love/component-onebot-v11-onebotbot.html#onebotbotgrouprelation
+                    bot.getGroupRelation().getGroups().collectAsync(
+                            bot, group -> {
+                                if (group.getId().equals(Identifies.of(task.getTargetId()))) {
+                                    bot.executeAsync(SendGroupMsgApi.create(group.getId(),
+                                            OneBotMessageOutgoing.create(task.getContent())));
+                                }
+                            }
+                    );
                 } else if ("1".equals(task.getTargetType())) {
-                    getBot().executeAsync(SendPrivateMsgApi.create(Identifies.of(task.getTargetId()),
-                            OneBotMessageOutgoing.create(task.getContent())));
-
+                    // https://simbot.forte.love/component-onebot-v11-onebotbot.html#onebotbotfriendrelation
+                    bot.getContactRelation().getContacts().collectAsync(
+                            bot, friend -> {
+                                log.info("正在发送定时任务,friend={}, msg={}", friend.getId(), task.getContent());
+                                if (friend.getId().equals(Identifies.of(task.getTargetId()))) {
+                                    bot.executeAsync(SendPrivateMsgApi.create(friend.getId(),
+                                            OneBotMessageOutgoing.create(task.getContent())));
+                                }
+                            }
+                    );
                 }
             });
         } catch (Exception e) {
@@ -67,24 +76,22 @@ public class BotScheduledTask {
     public void loveGreeting() {
         Calendar calendar = Calendar.getInstance();
         // 获取当前小时
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         // 只在早上8点到晚上22点发送消息
         if (hour < 8 || hour > 22) {
             return;
         }
 
         try {
-            OneBotBot bot = getBot();
-            assert bot != null;
-            val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年M月d日H时"));
-            val msg = String.format("现在是时间%s，要记得多喝热水哦！", currentTime);
-            var defaultGroups = new String[]{"710117186"};//todo 从数据库加载或者从配置文件加载
-            Arrays.stream(defaultGroups).forEach(id -> {
-                val group = Identifies.of(id);
-                log.info("正在发送定时任务,group={}, msg={}", id, msg);
-
-                bot.executeAsync(SendGroupMsgApi.create(group, OneBotMessageOutgoing.create(msg)));
-            });
+            final OneBotBot bot = getBot();
+            final String msg = String.format("现在是时间%s，要记得多喝热水哦！",
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年M月d日H时")));
+            bot.getGroupRelation().getGroups().collectAsync(
+                    bot, group -> {
+                        log.info("正在发送定时任务,group={}, msg={}", group.getId(), msg);
+                        bot.executeAsync(SendGroupMsgApi.create(group.getId(), OneBotMessageOutgoing.create(msg)));
+                    }
+            );
         } catch (Exception e) {
             log.error("定时任务发送异常!", e);
         }
@@ -96,7 +103,7 @@ public class BotScheduledTask {
                 .filter(it -> it instanceof OneBotBotManager)
                 .map(it -> (OneBotBotManager) it)
                 .findFirst()
-                .orElseThrow()
+                .orElseThrow(() -> new IllegalArgumentException("OneBotBotManager not found!"))
                 .get(Identifies.of(simBotConfig.getAuthorization().getBotUniqueId()));
     }
 }
