@@ -3,7 +3,6 @@ package com.miko.quartz;
 import com.miko.config.SimBotConfig;
 import com.miko.entity.BotTaskModel;
 import com.miko.service.BotTaskService;
-import kotlin.sequences.SequencesKt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -43,7 +42,7 @@ public class BotScheduledTask {
      * 每五分钟发送一次: 0 0/5 * * * ?
      * 每天晚上8点: 0 0 20 * * ?
      */
-    @Scheduled(cron = "0 0 20 * * ?")
+    @Scheduled(cron = "0 0 8 * * ?")
     public void goodMorning() {
         try {
             List<BotTaskModel> allTask = botTaskService.getAllActive();
@@ -70,19 +69,20 @@ public class BotScheduledTask {
         // 获取当前小时
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         // 只在早上8点到晚上22点发送消息
-//        if (hour < 8 || hour > 22) {
-//            return;
-//        }
+        if (hour < 8 || hour > 22) {
+            return;
+        }
 
         try {
             OneBotBot bot = getBot();
             assert bot != null;
-            String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            final String msg = currentTime + " hello";
-            var defaultGroups = new String[]{"710117186", "710117186"};
+            val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年M月d日H时"));
+            val msg = String.format("现在是时间%s，要记得多喝热水哦！", currentTime);
+            var defaultGroups = new String[]{"710117186"};//todo 从数据库加载或者从配置文件加载
             Arrays.stream(defaultGroups).forEach(id -> {
                 val group = Identifies.of(id);
                 log.info("正在发送定时任务,group={}, msg={}", id, msg);
+
                 bot.executeAsync(SendGroupMsgApi.create(group, OneBotMessageOutgoing.create(msg)));
             });
         } catch (Exception e) {
@@ -91,23 +91,12 @@ public class BotScheduledTask {
     }
 
     public OneBotBot getBot() {
-        val botId = simBotConfig.getAuthorization().getBotUniqueId();
-        var obManager = application.getBotManagers()
+        return application.getBotManagers()
                 .stream()
                 .filter(it -> it instanceof OneBotBotManager)
                 .map(it -> (OneBotBotManager) it)
                 .findFirst()
-                .orElseThrow();
-
-        // 遍历bot
-        obManager.all().iterator().forEachRemaining(bot -> {
-            // ...
-        });
-
-        // 也可以转成List
-        final var list = SequencesKt.toList(obManager.all());
-
-        // 通过你配置的 uniqueBotId 获取
-        return obManager.get(Identifies.of(botId));
+                .orElseThrow()
+                .get(Identifies.of(simBotConfig.getAuthorization().getBotUniqueId()));
     }
 }
