@@ -6,10 +6,10 @@ spring:
   application:
     name: simbot
   datasource:
-    username: simbot_user
-    password: simbot_pass
     url: jdbc:mysql://127.0.0.1:3306/simbot?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
+    username: simbot_user
+    password: ENC(tN/MShtMFUtjg7JaAX4GPGs3cKLgAkYt3ALi/JONZp6GlQxGx6U80NGqiPc2EcOi)
     type: com.alibaba.druid.pool.DruidDataSource            # 数据库连接池类别
     druid:
       initial-size: 5                                       # 初始化大小
@@ -49,3 +49,7 @@ logging:
     com:
       springboot:
         dao: debug
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_KEY:}

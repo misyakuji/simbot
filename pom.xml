@@ -43,6 +43,7 @@
         <onebot.version>5.0.0-Preview1</onebot.version>
         <ktor.version>2.3.13</ktor.version>
         <jsch.version>2.27.7</jsch.version>
+        <jasypt.version>4.0.4</jasypt.version>
 
         <!-- volcengine-java-sdk-ark-runtime -->
         <volcengine-java-sdk-ark-runtime.version>1.0.7</volcengine-java-sdk-ark-runtime.version>
@@ -115,6 +116,13 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.github.ulisesbocchio/jasypt-spring-boot-starter -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt.version}</version>
             </dependency>
 
             <!-- 解析YAML -->
