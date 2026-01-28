@@ -5,9 +5,9 @@ This is robot project with Simple Robot Framework in Springboot.
 ## 环境准备
 
 - 配置jdk25环境变量
+- 配置数据库
 - 配置 API Key
 - 配置maven
--
 
 ### 参考文档
 
@@ -23,6 +23,16 @@ https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html
 
 #Simple Robot Framework
 https://simbot.forte.love/home.html
+```
+
+### 数据库
+
+```bash
+#创建数据库和用户
+simbot-web/src/main/resources/ddl/init.sql
+
+#用于创建数据库表
+simbot-web/src/main/resources/ddl/schema.sql
 ```
 
 ### Linux环境运行
