@@ -3,9 +3,12 @@ package com.miko.listener;
 import com.miko.config.VolcArkConfig;
 import com.miko.entity.ChatContext;
 import com.miko.entity.napcat.response.GetFriendsWithCategoryResponse;
+import com.miko.service.ArkDoubaoService;
+import com.miko.service.FriendUserBotService;
 import com.miko.service.NapCatApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import love.forte.simbot.common.id.ID;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotFriendMessageEvent;
 import love.forte.simbot.quantcat.common.annotations.Filter;
 import love.forte.simbot.quantcat.common.annotations.Listener;
@@ -29,6 +32,8 @@ public class CommandEventListener {
     private final VolcArkConfig volcArkConfig;
     private final MessageEventListener messageEventListener;
     private final NapCatApiService napCatApiService;
+    private final FriendUserBotService friendUserService;
+    private final ArkDoubaoService arkDoubaoService;
 
     @Listener
     @Filter("/模型列表")
@@ -56,6 +61,7 @@ public class CommandEventListener {
         // 4. 标记中断（保持你原有逻辑）
         volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
     }
+
 
     @Listener
     @Filter(
@@ -92,6 +98,7 @@ public class CommandEventListener {
         String targetModel = modelList.get(modelIndex - 1);
         try {
             volcArkConfig.setModel(targetModel);
+            friendUserService.updateAiModel(event.getAuthorId(),targetModel);
             String successMsg = String.format("✅ 模型切换成功！\n当前模型：%s\n序号：%d", targetModel, modelIndex);
             event.getContent().sendAsync(successMsg);
             log.info("用户切换模型：{}（序号{}）", targetModel, modelIndex);
@@ -102,6 +109,52 @@ public class CommandEventListener {
 
         // 5. 标记中断后续监听
         volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+    }
+
+    @Listener
+    @Filter(
+            value =  "^(?:/设置聊天风格|/更新聊天风格|/changePersona)\\s*([\\s\\S]*)$",
+            matchType = MatchType.REGEX_MATCHES
+    )
+    public void updateAiPersona(OneBotFriendMessageEvent event) {
+        // 获取uid
+        ID authorId = event.getAuthorId();
+        // 获取风格提示词（保留原始换行）
+        String message = Objects.requireNonNull(event.getMessageContent().getPlainText()).trim();
+        // 关键修改：添加 Pattern.DOTALL 标志，让 . 匹配换行符
+        Pattern pattern = Pattern.compile(
+                "^(?:/设置聊天风格|/更新聊天风格|/changePersona)\\s*(.*)$",
+                Pattern.DOTALL  // 核心：开启DOTALL模式
+        );
+        Matcher matcher = pattern.matcher(message);
+        if (!matcher.matches()) {
+            return;
+        }
+        // 捕获组 1 现在能完整获取包含换行的所有风格提示词
+        String personaPrompt = matcher.group(1).trim();
+
+        if (personaPrompt.isEmpty()) {
+            event.getContent().sendAsync("你要先告诉我你想要什么样的聊天风格呀～");
+            return;
+        }
+        if (personaPrompt.length() > 3000) {
+            event.getContent().sendAsync("风格描述太长啦～我们简短一点好不好？");
+            return;
+        }
+
+//        String finalPersona = """
+//            你是一个虚拟女朋友，不允许提及你是 AI。
+//            以下是你的聊天风格设定：
+//            %s
+//            """.formatted(personaPrompt);
+        // 保存聊天风格
+        friendUserService.updateAiPrompt(String.valueOf(authorId), personaPrompt);
+
+        // 清空上次的Prompt连续会话
+        arkDoubaoService.clearChatContext(String.valueOf(authorId));
+
+        // 保存到数据库
+        event.getContent().sendAsync("记住啦～以后我就按这个风格陪你聊天 \uD83D\uDC96");
     }
 
     @Listener
@@ -346,6 +399,24 @@ public class CommandEventListener {
 
         // 标记中断后续监听
         volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+    }
+
+    @Listener
+    @Filter(
+            value = "^(/清空上下文|/重置对话|/clearContext)\\s*",
+            matchType = MatchType.REGEX_MATCHES
+    )
+    public void clearContextCommand(OneBotFriendMessageEvent event) {
+        // 1. 获取用户ID（即chatId）
+        String chatId = String.valueOf(event.getAuthorId());
+        // 2. 调用清空上下文方法
+        boolean isSuccess = arkDoubaoService.clearChatContext(chatId);
+        // 3. 给用户反馈
+        if (isSuccess) {
+            event.getContent().sendAsync("✨ 已帮主人清空所有聊天上下文啦～重新开始聊天吧～");
+        } else {
+            event.getContent().sendAsync("😥 清空上下文失败啦，是不是输入的指令有问题呀？");
+        }
     }
 
     // 反射获取MessageEventListener中的chatContexts
