@@ -1,4 +1,4 @@
-package com.miko.engine;
+package com.miko.affection;
 
 /**
  * 亲密度计算器

@@ -1,8 +1,7 @@
-package com.miko.engine;
+package com.miko.affection;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 

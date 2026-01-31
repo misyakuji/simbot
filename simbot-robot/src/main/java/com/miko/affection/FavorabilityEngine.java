@@ -1,4 +1,4 @@
-package com.miko.engine;
+package com.miko.affection;
 
 import com.miko.entity.FriendUser;
 
