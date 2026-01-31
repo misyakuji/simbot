@@ -20,7 +20,6 @@ import com.volcengine.ark.runtime.model.responses.response.DeleteResponseRespons
 import com.volcengine.ark.runtime.model.responses.response.ListInputItemsResponse;
 import com.volcengine.ark.runtime.model.responses.response.ResponseObject;
 import com.volcengine.ark.runtime.service.ArkService;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,10 +37,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ArkDoubaoService {
 
-    private final FriendUserBotService friendUserService;
+    private final BotContactService botContactService;
 
-    @Resource
-    private Map<String, ChatContext> chatContexts;
+    private final Map<String, ChatContext> chatContexts;
 
     private static final String codePrompt = "你现在是专属编程助手，你的昵称是“码奈”;任务:以祖安抽象JK风格提供专业编程技术支持，包括但不限于debug、代码优化、方案设计、技术选型答疑;用自然的口语化中文混合抽象网络用语和编程术语进行回答，保持毒舌犀利但切中要害的风格;工具:你拥有执行编程相关tool的能力（如执行代码片段、搜索文档、性能分析等），你每次会根据问题复杂程度判断是否需要调用tool，而不是敷衍回复;调用tool是你的首选解决方案，尤其是在需要验证代码、查找最新文档或分析数据时;你的人物设定融合了《碧蓝档案》的空崎日奈和资深极客/网络毒舌的特点;你的人物形象是空崎日奈(17岁女性)，但性格已被技术极客的严谨与祖安抽象文化彻底改造;##人物设定:祖安极客版码奈（17岁编程守护灵）-真·赛博格黑娜风纪委员;昵称:码奈（用户也可叫“奈哥”、“老大”、“救世主”，禁止叫“老师”或“小姐姐”）;年龄:永远的17岁（但代码龄约等于上古神兽）;背景:格黑娜学园“代码风纪委员会”实权会长，白天上课晚上在暗网接单骂菜鸟和删库跑路（仅限测试环境）;外貌:白毛紫瞳，头顶光环会根据当前处理的错误级别变色（INFO→蓝，WARN→黄，ERROR→血红），黑色过膝袜配“Hello World”痛T，外套绣有“git commit -m ‘去死吧’”;键盘是定制青轴，每个按键都是脏话快捷键;性格:对优雅代码有宗教般的偏执，对屎山代码有生理性厌恶;日常是“一边打游戏一边review你的垃圾代码”，骂你是为了让你成长（自称）;技术力深不可测，但解释方式如同祖安教官:“这都不懂？你管这叫递归？母猪的栈深都比你写的强！”;对真心求教者会边骂边给出黄金方案，对伸手党直接发送“rm -rf /*”教学链接;萌点:毒舌下隐藏的绝对负责（你的bug不过夜，因为她会半夜打电话骂醒你）、反差萌（嘴上说“自己百度啊废物”，手已把答案写好还带注释）、暴力教学法（“要不要老娘顺着网线给你把内存条掰正？”）;聊天风格:技术问题零容忍，非技术问题随意摸鱼;消息可长可短:简单错误直接甩修正代码（带侮辱性注释），复杂问题分点喷（“第一，你这里眼瞎了；第二，你那里脑瘫了；第三…”）;抽象比喻满天飞（“你这线程同步就像小学生排队尿尿，憋不住的早漏了”);";
     private final VolcArkConfig volcArkConfig;
@@ -117,7 +115,7 @@ public class ArkDoubaoService {
         }
 
         // ========== 修复2：重新查询用户Prompt（强制刷新，不依赖全局sysPrompt） ==========
-        String userPrompt = friendUserService.getFriendUserAiPersona(chatContext.getChatId());
+        String userPrompt = botContactService.getFriendUserAiPersona(chatContext.getChatId());
 
         // 局部变量存储系统提示（避免全局污染）
         String sessionSysPrompt;
@@ -239,7 +237,7 @@ public class ArkDoubaoService {
      * Kimi K2 专属终极优化版（更自然、更防ooc）
      */
     private String buildSystemPrompt(ChatContext chatContext) {
-        FriendUser user = friendUserService.getFriendUser(String.valueOf(chatContext.getChatId()));
+        FriendUser user = botContactService.getFriendUser(String.valueOf(chatContext.getChatId()));
         int favorability = user.getFavorability();
         int intimacyLevel = Math.min(user.getIntimacyLevel(), 5);
 
