@@ -4,7 +4,7 @@ import com.miko.config.VolcArkConfig;
 import com.miko.entity.ChatContext;
 import com.miko.entity.napcat.response.GetFriendsWithCategoryResponse;
 import com.miko.service.ArkDoubaoService;
-import com.miko.service.FriendUserBotService;
+import com.miko.service.BotContactService;
 import com.miko.service.NapCatApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class CommandEventListener {
     private final VolcArkConfig volcArkConfig;
     private final MessageEventListener messageEventListener;
     private final NapCatApiService napCatApiService;
-    private final FriendUserBotService friendUserService;
+    private final BotContactService botContactService;
     private final ArkDoubaoService arkDoubaoService;
 
     @Listener
@@ -98,7 +98,7 @@ public class CommandEventListener {
         String targetModel = modelList.get(modelIndex - 1);
         try {
             volcArkConfig.setModel(targetModel);
-            friendUserService.updateAiModel(event.getAuthorId(),targetModel);
+            botContactService.updateAiModel(event.getAuthorId(),targetModel);
             String successMsg = String.format("✅ 模型切换成功！\n当前模型：%s\n序号：%d", targetModel, modelIndex);
             event.getContent().sendAsync(successMsg);
             log.info("用户切换模型：{}（序号{}）", targetModel, modelIndex);
@@ -148,7 +148,7 @@ public class CommandEventListener {
 //            %s
 //            """.formatted(personaPrompt);
         // 保存聊天风格
-        friendUserService.updateAiPrompt(String.valueOf(authorId), personaPrompt);
+        botContactService.updateAiPrompt(String.valueOf(authorId), personaPrompt);
 
         // 清空上次的Prompt连续会话
         arkDoubaoService.clearChatContext(String.valueOf(authorId));

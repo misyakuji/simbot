@@ -3,7 +3,7 @@ package com.miko.service;
 import com.miko.entity.FriendUser;
 import love.forte.simbot.common.id.ID;
 
-public interface FriendUserBotService {
+public interface BotContactService {
 
     /**
      * 查询好感度

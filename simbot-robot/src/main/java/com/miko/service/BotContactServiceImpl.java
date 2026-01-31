@@ -4,7 +4,7 @@ import com.miko.engine.FavorabilityContext;
 import com.miko.engine.FavorabilityEngine;
 import com.miko.engine.FavorabilityResult;
 import com.miko.entity.FriendUser;
-import com.miko.mapper.FriendUserMapper;
+import com.miko.mapper.BotContactMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import love.forte.simbot.common.id.ID;
@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FriendUserBotServiceImpl implements FriendUserBotService {
+public class BotContactServiceImpl implements BotContactService {
 
-    private final FriendUserMapper friendUserMapper;
+    private final BotContactMapper botContactMapper;
 
     /**
      * 查询好感度
@@ -26,7 +26,7 @@ public class FriendUserBotServiceImpl implements FriendUserBotService {
      */
     @Override
     public Integer getFavorability(String authorId) {
-        return friendUserMapper.selectFavorabilityByQqId(authorId);
+        return botContactMapper.selectFavorabilityByQqId(authorId);
     }
 
     /**
@@ -62,22 +62,22 @@ public class FriendUserBotServiceImpl implements FriendUserBotService {
         // 更新时间
         user.setUpdateTime(LocalDateTime.now());
 
-        friendUserMapper.insertFriendUser(user);
+        botContactMapper.insertFriendUser(user);
     }
 
     @Override
     public void updateAiPrompt(String authorId, String prompt) {
-        friendUserMapper.updateAiPrompt(authorId, prompt);
+        botContactMapper.updateAiPrompt(authorId, prompt);
     }
 
     @Override
     public String getFriendUserAiPersona(ID chatId) {
-        return friendUserMapper.getFriendUserAiPersona(String.valueOf(chatId));
+        return botContactMapper.getFriendUserAiPersona(String.valueOf(chatId));
     }
 
     @Override
     public FriendUser getFriendUser(String authorId) {
-        return friendUserMapper.getFriendUser(authorId);
+        return botContactMapper.getFriendUser(authorId);
     }
 
     @Override
@@ -108,12 +108,12 @@ public class FriendUserBotServiceImpl implements FriendUserBotService {
             user.setLastTalkTime(ctx.getNow());
         }
 
-        friendUserMapper.updateGoodFeeling(user);
+        botContactMapper.updateGoodFeeling(user);
     }
 
     @Override
     public void updateAiModel(ID authorId, String targetModel) {
-        friendUserMapper.updateAiModel(String.valueOf(authorId), targetModel);
+        botContactMapper.updateAiModel(String.valueOf(authorId), targetModel);
         log.info("用户 {} AI模型更新为 {}", authorId, targetModel);
     }
 }
