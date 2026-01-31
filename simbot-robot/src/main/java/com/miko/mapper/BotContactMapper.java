@@ -4,7 +4,7 @@ import com.miko.entity.FriendUser;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
-public interface FriendUserMapper  {
+public interface BotContactMapper {
 
     /**
      * 查询好友好感度，不存在返回 null
