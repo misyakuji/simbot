@@ -1,8 +1,8 @@
 package com.miko.service;
 
-import com.miko.engine.FavorabilityContext;
-import com.miko.engine.FavorabilityEngine;
-import com.miko.engine.FavorabilityResult;
+import com.miko.affection.FavorabilityContext;
+import com.miko.affection.FavorabilityEngine;
+import com.miko.affection.FavorabilityResult;
 import com.miko.entity.FriendUser;
 import com.miko.mapper.BotContactMapper;
 import lombok.RequiredArgsConstructor;
