@@ -5,7 +5,7 @@ import com.miko.config.VolcArkConfig;
 import com.miko.entity.ChatContext;
 import com.miko.entity.FriendUser;
 import com.miko.service.ArkDoubaoService;
-import com.miko.service.FriendUserBotService;
+import com.miko.service.BotContactService;
 import com.miko.util.OneBotMessageUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class MessageEventListener {
     private final VolcArkConfig volcArkConfig;
 
     private final ArkDoubaoService arkDoubaoService;
-    private final FriendUserBotService friendUserService;
+    private final BotContactService botContactService;
 
     /**
      * 注入全局 对话上下文: key = 对话类型+群聊ID/好友ID+对话ID value = 该对话的上下文
@@ -116,14 +116,14 @@ public class MessageEventListener {
         log.info("接收 <- 私聊 [{}({})] {}", friendNickname, friendId, msgFix);
 
         // 3️⃣ 查询数据库好友记录
-        FriendUser user = friendUserService.getFriendUser(String.valueOf(friendId));
+        FriendUser user = botContactService.getFriendUser(String.valueOf(friendId));
         if (user == null) {
             // 首次消息，创建好友记录
-            friendUserService.insertFriendUser(String.valueOf(friendId), friendNickname);
-            user = friendUserService.getFriendUser(String.valueOf(friendId));
+            botContactService.insertFriendUser(String.valueOf(friendId), friendNickname);
+            user = botContactService.getFriendUser(String.valueOf(friendId));
         }
 
-        friendUserService.updateFriendUser(user,msgFix);
+        botContactService.updateFriendUser(user,msgFix);
 
         // 7️⃣ 调用 AI 处理聊天
         String referenceKey = ChatContext.ChatType.PRIVATE.toString() + friendId;
