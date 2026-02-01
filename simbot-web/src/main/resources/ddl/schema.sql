@@ -22,37 +22,55 @@ CREATE TABLE IF NOT EXISTS `bot_task`
 -- bot聊天联系人
 CREATE TABLE IF NOT EXISTS `bot_chat_contact`
 (
-    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '排序id',
-    `contact_id` BIGINT NOT NULL COMMENT 'QQ号 / 用户唯一ID',
+    `id`              INT(11)          NOT NULL AUTO_INCREMENT COMMENT '排序id',
+    `contact_id`      BIGINT           NOT NULL COMMENT 'QQ号 / 用户唯一ID',
 
     -- 核心关系字段
-    `favorability` INT NOT NULL DEFAULT 0 COMMENT '好感度',
-    `intimacy_level` INT NOT NULL DEFAULT 0 COMMENT '亲密等级',
+    `favorability`    INT              NOT NULL DEFAULT 0 COMMENT '好感度',
+    `intimacy_level`  INT              NOT NULL DEFAULT 0 COMMENT '亲密等级',
 
     -- 互动记忆
-    `talk_count` INT NOT NULL DEFAULT 0 COMMENT '累计聊天次数',
-    `last_talk_time` DATETIME NULL COMMENT '最后一次聊天时间',
+    `talk_count`      INT              NOT NULL DEFAULT 0 COMMENT '累计聊天次数',
+    `last_talk_time`  DATETIME         NULL COMMENT '最后一次聊天时间',
 
     -- 主观印象
-    `mood` INT NOT NULL DEFAULT 0 COMMENT '她当前对你的情绪状态',
-    `remark` VARCHAR(64) NULL COMMENT 'Bot给你的备注',
+    `mood`            INT              NOT NULL DEFAULT 0 COMMENT '她当前对你的情绪状态',
+    `remark`          VARCHAR(64)      NULL COMMENT 'Bot给你的备注',
 
     -- AI状态与人格
-    `ai_persona` VARCHAR(32) NOT NULL DEFAULT 'default' COMMENT 'AI人格模板',
-    `ai_model` VARCHAR(64) NOT NULL DEFAULT 'deepseek-chat' COMMENT '当前使用的AI模型',
-    `ai_temperature` DECIMAL(3,2) NOT NULL DEFAULT 0.7 COMMENT 'AI随机度/情绪浮动',
-    `ai_memory_summary` TEXT NULL COMMENT 'AI对该用户的长期记忆摘要',
+    `ai_persona`      VARCHAR(32)      NOT NULL DEFAULT 'default' COMMENT 'AI人格模板',
+    `ai_model`        VARCHAR(64)      NOT NULL DEFAULT 'deepseek-chat' COMMENT '当前使用的AI模型',
+    `ai_temperature`  DECIMAL(3,2)     NOT NULL DEFAULT 0.7 COMMENT 'AI随机度/情绪浮动',
+    `ai_memory_summary` TEXT           NULL COMMENT 'AI对该用户的长期记忆摘要',
 
     -- 时间字段
-    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '首次见面时间',
-    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ON UPDATE CURRENT_TIMESTAMP COMMENT '数据更新时间',
+    `create_time`     DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '首次见面时间',
+    `update_time`     DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '数据更新时间',
 
     PRIMARY KEY (`id`) USING BTREE,
     INDEX idx_favorability (`favorability`),
     INDEX idx_last_talk_time (`last_talk_time`),
     INDEX idx_intimacy_level (`intimacy_level`)
-    ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4
-    COLLATE = utf8mb4_unicode_ci
-    COMMENT ='Bot用户表：记录她对用户的关系、好感度、人格和AI状态';
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT ='Bot联系人表：记录Bot对联系人的关系、好感度、人格和AI状态';
+
+-- Bot全局配置表
+CREATE TABLE IF NOT EXISTS `bot_global_config`
+(
+    `config_id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '全局配置ID',
+    `bot_id`               VARCHAR(255)    NOT NULL COMMENT 'Bot ID',
+    `master_id`            VARCHAR(255)    NOT NULL COMMENT 'Bot主人ID',
+    `current_model`        VARCHAR(64)     NOT NULL COMMENT '当前使用的模型',
+    `model_list`           JSON            NULL COMMENT '可用模型列表（JSON格式）',
+    `deep_thinking_enabled` CHAR(1)        NOT NULL DEFAULT '0' COMMENT '深度思考标志：1-开启，0-关闭',
+    `model_parameters`     TEXT            NULL COMMENT '模型参数（JSON格式）',
+    `enabled`              CHAR(1)         NOT NULL DEFAULT '1' COMMENT '可用性：1-可用，0-不可用',
+    `create_time`          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`config_id`, `bot_id`),
+    INDEX idx_bot_global_config_enabled (`enabled`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='Bot全局配置表';
