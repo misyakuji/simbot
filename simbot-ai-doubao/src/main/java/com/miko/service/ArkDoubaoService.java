@@ -1,8 +1,8 @@
 package com.miko.service;
 
 import com.miko.config.VolcArkConfig;
-import com.miko.entity.BotChatContext;
 import com.miko.entity.BotChatContact;
+import com.miko.entity.BotChatContext;
 import com.volcengine.ark.runtime.exception.ArkHttpException;
 import com.volcengine.ark.runtime.model.completion.chat.ChatCompletionRequest;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessage;
