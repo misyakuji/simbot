@@ -81,12 +81,12 @@ public class BotScheduledTask {
             final OneBotBot bot = getBot();
             final String msg = String.format("现在是时间%s，要记得多喝热水哦！",
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年M月d日H时")));
-            bot.getGroupRelation().getGroups().collectAsync(
-                    bot, group -> {
-                        group.sendAsync(msg);
-                        log.info("发送定时任务,group={}, msg={}", group.getId(), msg);
-                    }
-            );
+//            bot.getGroupRelation().getGroups().collectAsync(
+//                    bot, group -> {
+//                        group.sendAsync(msg);
+//                        log.info("发送定时任务,group={}, msg={}", group.getId(), msg);
+//                    }
+//            );
         } catch (Exception e) {
             log.error("定时任务发送异常!", e);
         }

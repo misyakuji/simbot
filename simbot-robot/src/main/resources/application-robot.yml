@@ -30,29 +30,3 @@ spring:
         options:
           model: deepseek-chat
           temperature: 0.8
-
-# 火山方舟（豆包API）配置
-volc:
-  ark:
-    api-key: ${ARK_API_KEY}
-    base-url: https://ark.cn-beijing.volces.com/api/v3
-    model: kimi-k2-thinking-251104
-    models:
-      - kimi-k2-thinking-251104
-      - deepseek-v3-2-251201
-      - doubao-seed-1-6-251015
-      - doubao-seedance-1-0-pro-250528
-      - doubao-seed-1-6-vision-250815
-      - doubao-seed-1-6-thinking-250715
-      - doubao-seed-1-6-flash-250828
-      - doubao-seed-1-6-lite-251015
-      - doubao-seed-code-preview-251028
-      - doubao-1-5-thinking-pro-250415
-      - deepseek-v3-1-terminus
-      - doubao-1.5-vision-pro-250328
-      - doubao-1-5-ui-tars-250428
-      - deepseek-r1-250528
-      - deepseek-v3-250324
-      - doubao-1-5-pro-32k-250115
-      - doubao-1-5-pro-256k-250115
-      - doubao-1-5-lite-32k-250115

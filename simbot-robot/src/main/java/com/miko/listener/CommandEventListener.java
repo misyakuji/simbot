@@ -1,11 +1,14 @@
 package com.miko.listener;
 
 import com.miko.config.VolcArkConfig;
-import com.miko.entity.ChatContext;
+import com.miko.entity.BotChatContext;
 import com.miko.entity.napcat.response.GetFriendsWithCategoryResponse;
+import com.miko.service.ArkDoubaoService;
+import com.miko.service.BotContactService;
 import com.miko.service.NapCatApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import love.forte.simbot.common.id.ID;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotFriendMessageEvent;
 import love.forte.simbot.quantcat.common.annotations.Filter;
 import love.forte.simbot.quantcat.common.annotations.Listener;
@@ -29,6 +32,8 @@ public class CommandEventListener {
     private final VolcArkConfig volcArkConfig;
     private final MessageEventListener messageEventListener;
     private final NapCatApiService napCatApiService;
+    private final BotContactService botContactService;
+    private final ArkDoubaoService arkDoubaoService;
 
     @Listener
     @Filter("/模型列表")
@@ -54,8 +59,9 @@ public class CommandEventListener {
         event.getContent().sendAsync(replyContent.toString());
 
         // 4. 标记中断（保持你原有逻辑）
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
+
 
     @Listener
     @Filter(
@@ -68,7 +74,7 @@ public class CommandEventListener {
         Matcher matcher = Pattern.compile("^(?:/切换模型|/changeModel)(\\d+)$").matcher(cmd);
         if (!matcher.find()) {
             event.getContent().sendAsync("❌ 指令格式错误！正确格式：/切换模型1 或 /changeModel1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -77,7 +83,7 @@ public class CommandEventListener {
             modelIndex = Integer.parseInt(matcher.group(1)); // 提取序号（如 1、2）
         } catch (NumberFormatException e) {
             event.getContent().sendAsync("❌ 序号必须是数字！正确格式：/切换模型1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -85,13 +91,14 @@ public class CommandEventListener {
         if (modelIndex < 1 || modelIndex > modelList.size()) {
             String tip = String.format("❌ 序号超出范围！当前支持 1~%d 号模型", modelList.size());
             event.getContent().sendAsync(tip);
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
         String targetModel = modelList.get(modelIndex - 1);
         try {
             volcArkConfig.setModel(targetModel);
+            botContactService.updateAiModel(event.getAuthorId().toString(), targetModel);
             String successMsg = String.format("✅ 模型切换成功！\n当前模型：%s\n序号：%d", targetModel, modelIndex);
             event.getContent().sendAsync(successMsg);
             log.info("用户切换模型：{}（序号{}）", targetModel, modelIndex);
@@ -101,7 +108,53 @@ public class CommandEventListener {
         }
 
         // 5. 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
+    }
+
+    @Listener
+    @Filter(
+            value = "^(?:/设置聊天风格|/更新聊天风格|/changePersona)\\s*([\\s\\S]*)$",
+            matchType = MatchType.REGEX_MATCHES
+    )
+    public void updateAiPersona(OneBotFriendMessageEvent event) {
+        // 获取uid
+        ID authorId = event.getAuthorId();
+        // 获取风格提示词（保留原始换行）
+        String message = Objects.requireNonNull(event.getMessageContent().getPlainText()).trim();
+        // 关键修改：添加 Pattern.DOTALL 标志，让 . 匹配换行符
+        Pattern pattern = Pattern.compile(
+                "^(?:/设置聊天风格|/更新聊天风格|/changePersona)\\s*(.*)$",
+                Pattern.DOTALL  // 核心：开启DOTALL模式
+        );
+        Matcher matcher = pattern.matcher(message);
+        if (!matcher.matches()) {
+            return;
+        }
+        // 捕获组 1 现在能完整获取包含换行的所有风格提示词
+        String personaPrompt = matcher.group(1).trim();
+
+        if (personaPrompt.isEmpty()) {
+            event.getContent().sendAsync("你要先告诉我你想要什么样的聊天风格呀～");
+            return;
+        }
+        if (personaPrompt.length() > 3000) {
+            event.getContent().sendAsync("风格描述太长啦～我们简短一点好不好？");
+            return;
+        }
+
+//        String finalPersona = """
+//            你是一个虚拟女朋友，不允许提及你是 AI。
+//            以下是你的聊天风格设定：
+//            %s
+//            """.formatted(personaPrompt);
+        // 保存聊天风格
+        botContactService.updateAiPrompt(String.valueOf(authorId), personaPrompt);
+
+        // 清空上次的Prompt连续会话
+        arkDoubaoService.clearChatContext(String.valueOf(authorId));
+
+        // 保存到数据库
+        event.getContent().sendAsync("记住啦～以后我就按这个风格陪你聊天 \uD83D\uDC96");
     }
 
     @Listener
@@ -119,7 +172,7 @@ public class CommandEventListener {
             isDeepThinking = false;
         } else {
             event.getContent().sendAsync("❌ 指令格式错误！正确格式：/开启深度思考 或 /关闭深度思考");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -133,7 +186,7 @@ public class CommandEventListener {
             event.getContent().sendAsync("❌ 深度思考设置失败！原因：" + e.getMessage());
         }
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -143,11 +196,11 @@ public class CommandEventListener {
     public void chatListCmdEvent(OneBotFriendMessageEvent event) {
         try {
             // 获取对话上下文
-            Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+            Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
 
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -155,11 +208,11 @@ public class CommandEventListener {
             StringBuilder replyContent = new StringBuilder();
             replyContent.append("📋 当前对话列表：\n\n");
 
-            List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
+            List<Map.Entry<String, BotChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
             for (int i = 0; i < chatList.size(); i++) {
-                Map.Entry<String, ChatContext> entry = chatList.get(i);
+                Map.Entry<String, BotChatContext> entry = chatList.get(i);
                 String key = entry.getKey();
-                ChatContext context = entry.getValue();
+                BotChatContext context = entry.getValue();
 
                 replyContent.append(String.format("%d. 对话ID：%s\n", i + 1, key));
                 replyContent.append(String.format("   聊天类型：%s\n", context.getChatType()));
@@ -175,7 +228,7 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -189,7 +242,7 @@ public class CommandEventListener {
 
         if (!matcher.find()) {
             event.getContent().sendAsync("❌ 指令格式错误！正确格式：/删除对话1 或 /removeChat1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -198,33 +251,33 @@ public class CommandEventListener {
             chatIndex = Integer.parseInt(matcher.group(1)); // 提取对话序号
         } catch (NumberFormatException e) {
             event.getContent().sendAsync("❌ 序号必须是数字！正确格式：/删除对话1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
         try {
             // 获取对话上下文
-            Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+            Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
 
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
-            List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
+            List<Map.Entry<String, BotChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
 
             if (chatIndex < 1 || chatIndex > chatList.size()) {
                 String tip = String.format("❌ 对话序号超出范围！当前共有 %d 个对话", chatList.size());
                 event.getContent().sendAsync(tip);
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
             // 删除指定序号的对话
-            Map.Entry<String, ChatContext> entryToRemove = chatList.get(chatIndex - 1);
+            Map.Entry<String, BotChatContext> entryToRemove = chatList.get(chatIndex - 1);
             String removedKey = entryToRemove.getKey();
-            ChatContext removedContext = entryToRemove.getValue();
+            BotChatContext removedContext = entryToRemove.getValue();
 
             // 从上下文Map中删除
             removeChatContextFromMessageEventListener(removedKey);
@@ -239,7 +292,7 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -252,7 +305,7 @@ public class CommandEventListener {
 
             if (response == null || response.getData() == null || response.getData().isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有好友数据");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -296,7 +349,7 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -308,7 +361,7 @@ public class CommandEventListener {
 
             if (response == null || response.getData() == null || response.getData().isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有好友数据");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -345,19 +398,37 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
+    }
+
+    @Listener
+    @Filter(
+            value = "^(/清空上下文|/重置对话|/clearContext)\\s*",
+            matchType = MatchType.REGEX_MATCHES
+    )
+    public void clearContextCommand(OneBotFriendMessageEvent event) {
+        // 1. 获取用户ID（即chatId）
+        String chatId = String.valueOf(event.getAuthorId());
+        // 2. 调用清空上下文方法
+        boolean isSuccess = arkDoubaoService.clearChatContext(chatId);
+        // 3. 给用户反馈
+        if (isSuccess) {
+            event.getContent().sendAsync("✨ 已帮主人清空所有聊天上下文啦～重新开始聊天吧～");
+        } else {
+            event.getContent().sendAsync("😥 清空上下文失败啦，是不是输入的指令有问题呀？");
+        }
     }
 
     // 反射获取MessageEventListener中的chatContexts
-    private Map<String, ChatContext> getChatContextsFromMessageEventListener() throws Exception {
+    private Map<String, BotChatContext> getChatContextsFromMessageEventListener() throws Exception {
         java.lang.reflect.Field field = MessageEventListener.class.getDeclaredField("chatContexts");
         field.setAccessible(true);
-        return (Map<String, ChatContext>) field.get(messageEventListener);
+        return (Map<String, BotChatContext>) field.get(messageEventListener);
     }
 
     // 反射从MessageEventListener中删除指定的chatContext
     private void removeChatContextFromMessageEventListener(String key) throws Exception {
-        Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+        Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
         chatContexts.remove(key);
     }
 }
