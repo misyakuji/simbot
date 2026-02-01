@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `bot_chat_contact`
 CREATE TABLE IF NOT EXISTS `bot_global_config`
 (
     `config_id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '全局配置ID',
-    `bot_id`               VARCHAR(255)    NOT NULL COMMENT 'Bot ID',
+    `bot_id`               VARCHAR(255)    NOT NULL COMMENT 'BotID',
     `master_id`            VARCHAR(255)    NOT NULL COMMENT 'Bot主人ID',
     `current_model`        VARCHAR(64)     NOT NULL COMMENT '当前使用的模型',
     `model_list`           JSON            NULL COMMENT '可用模型列表（JSON格式）',
@@ -74,3 +74,25 @@ CREATE TABLE IF NOT EXISTS `bot_global_config`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='Bot全局配置表';
+
+-- AI审计日志表
+CREATE TABLE IF NOT EXISTS `bot_ai_audit_log`
+(
+    `audit_id`       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+    `bot_id`         VARCHAR(255)    NOT NULL COMMENT 'BotID',
+    `request_id`     VARCHAR(64)     NOT NULL COMMENT '请求ID',
+    `model_name`     VARCHAR(32)     NOT NULL COMMENT '模型名称',
+    `input_text`     TEXT            NULL COMMENT '输入文本',
+    `output_text`    TEXT            NULL COMMENT '输出文本',
+    `user_id`        VARCHAR(64)     NOT NULL COMMENT '用户ID',
+    `ip_address`     VARCHAR(45)     NULL COMMENT 'IP地址',
+    `processing_time` INT            NULL COMMENT '处理时间（毫秒）',
+    `risk_level`     TINYINT         NULL COMMENT '风险等级（0-3）',
+    `created_at`     DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`audit_id`),
+    INDEX idx_ai_audit_log_request_id (`request_id`),
+    INDEX idx_ai_audit_log_user_id (`user_id`),
+    INDEX idx_ai_audit_log_created_at (`created_at`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI审计日志表：记录AI模型调用的审计信息';
