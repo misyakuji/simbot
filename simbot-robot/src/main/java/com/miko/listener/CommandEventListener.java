@@ -1,7 +1,7 @@
 package com.miko.listener;
 
 import com.miko.config.VolcArkConfig;
-import com.miko.entity.ChatContext;
+import com.miko.entity.BotChatContext;
 import com.miko.entity.napcat.response.GetFriendsWithCategoryResponse;
 import com.miko.service.ArkDoubaoService;
 import com.miko.service.BotContactService;
@@ -196,7 +196,7 @@ public class CommandEventListener {
     public void chatListCmdEvent(OneBotFriendMessageEvent event) {
         try {
             // 获取对话上下文
-            Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+            Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
 
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
@@ -208,11 +208,11 @@ public class CommandEventListener {
             StringBuilder replyContent = new StringBuilder();
             replyContent.append("📋 当前对话列表：\n\n");
 
-            List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
+            List<Map.Entry<String, BotChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
             for (int i = 0; i < chatList.size(); i++) {
-                Map.Entry<String, ChatContext> entry = chatList.get(i);
+                Map.Entry<String, BotChatContext> entry = chatList.get(i);
                 String key = entry.getKey();
-                ChatContext context = entry.getValue();
+                BotChatContext context = entry.getValue();
 
                 replyContent.append(String.format("%d. 对话ID：%s\n", i + 1, key));
                 replyContent.append(String.format("   聊天类型：%s\n", context.getChatType()));
@@ -257,7 +257,7 @@ public class CommandEventListener {
 
         try {
             // 获取对话上下文
-            Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+            Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
 
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
@@ -265,7 +265,7 @@ public class CommandEventListener {
                 return;
             }
 
-            List<Map.Entry<String, ChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
+            List<Map.Entry<String, BotChatContext>> chatList = new ArrayList<>(chatContexts.entrySet());
 
             if (chatIndex < 1 || chatIndex > chatList.size()) {
                 String tip = String.format("❌ 对话序号超出范围！当前共有 %d 个对话", chatList.size());
@@ -275,9 +275,9 @@ public class CommandEventListener {
             }
 
             // 删除指定序号的对话
-            Map.Entry<String, ChatContext> entryToRemove = chatList.get(chatIndex - 1);
+            Map.Entry<String, BotChatContext> entryToRemove = chatList.get(chatIndex - 1);
             String removedKey = entryToRemove.getKey();
-            ChatContext removedContext = entryToRemove.getValue();
+            BotChatContext removedContext = entryToRemove.getValue();
 
             // 从上下文Map中删除
             removeChatContextFromMessageEventListener(removedKey);
@@ -420,15 +420,15 @@ public class CommandEventListener {
     }
 
     // 反射获取MessageEventListener中的chatContexts
-    private Map<String, ChatContext> getChatContextsFromMessageEventListener() throws Exception {
+    private Map<String, BotChatContext> getChatContextsFromMessageEventListener() throws Exception {
         java.lang.reflect.Field field = MessageEventListener.class.getDeclaredField("chatContexts");
         field.setAccessible(true);
-        return (Map<String, ChatContext>) field.get(messageEventListener);
+        return (Map<String, BotChatContext>) field.get(messageEventListener);
     }
 
     // 反射从MessageEventListener中删除指定的chatContext
     private void removeChatContextFromMessageEventListener(String key) throws Exception {
-        Map<String, ChatContext> chatContexts = getChatContextsFromMessageEventListener();
+        Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
         chatContexts.remove(key);
     }
 }

@@ -1,6 +1,6 @@
 package com.miko.mapper;
 
-import com.miko.entity.FriendUser;
+import com.miko.entity.BotChatContact;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
@@ -28,7 +28,7 @@ public interface BotContactMapper {
             "#{userId}, #{favorability}, #{intimacyLevel}, #{talkCount}, #{lastTalkTime}, #{mood}, #{remark}, " +
             "#{aiPersona}, #{aiModel}, #{aiTemperature}, #{aiMemorySummary}, #{createTime}, #{updateTime}" +
             ")")
-    void insertFriendUser(FriendUser user);
+    void insertFriendUser(BotChatContact user);
 
 
     /**
@@ -49,20 +49,20 @@ public interface BotContactMapper {
 
     /**
      * 更新好感度相关信息
-     * @param user FriendUser
+     * @param user BotChatContact
      */
     @Update("UPDATE friend_user SET favorability = #{favorability}, intimacy_level = #{intimacyLevel}, " +
             "talk_count = #{talkCount}, mood = #{mood}, last_talk_time = #{lastTalkTime} " +
             "WHERE user_id = #{userId}")
-    void updateGoodFeeling(FriendUser user);
+    void updateGoodFeeling(BotChatContact user);
 
     /**
      * 获取好友用户
      * @param qqId 发送者QQ_ID
-     * @return FriendUser
+     * @return BotChatContact
      */
     @Select("SELECT * FROM friend_user WHERE user_id = #{qqId}")
-    FriendUser getFriendUser(@Param("qqId") String qqId);
+    BotChatContact getFriendUser(@Param("qqId") String qqId);
 
     /**
      * 更新ai模型

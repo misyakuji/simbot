@@ -2,8 +2,8 @@ package com.miko.listener;
 
 
 import com.miko.config.VolcArkConfig;
-import com.miko.entity.ChatContext;
-import com.miko.entity.FriendUser;
+import com.miko.entity.BotChatContext;
+import com.miko.entity.BotChatContact;
 import com.miko.service.ArkDoubaoService;
 import com.miko.service.BotContactService;
 import com.miko.util.OneBotMessageUtil;
@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import love.forte.simbot.common.PriorityConstant;
 import love.forte.simbot.common.id.ID;
-import love.forte.simbot.common.id.Identifies;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotFriendMessageEvent;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotGroupMessageEvent;
 import love.forte.simbot.component.onebot.v11.core.event.message.OneBotMessageEvent;
@@ -37,7 +36,7 @@ public class MessageEventListener {
      * 注入全局 对话上下文: key = 对话类型+群聊ID/好友ID+对话ID value = 该对话的上下文
      */
     @Resource
-    private Map<String, ChatContext> chatContexts;
+    private Map<String, BotChatContext> chatContexts;
 
     @Listener
     public void msgEvent(OneBotMessageEvent event) {
@@ -89,16 +88,16 @@ public class MessageEventListener {
         String msgfix = OneBotMessageUtil.fixMessage(event);
 
         // 获取该群的对话上下文，如果不存在则创建新的
-        String referenceKey = ChatContext.ChatType.PRIVATE + groupId;
-        ChatContext chatContext = chatContexts.computeIfAbsent(referenceKey, k ->
-                ChatContext.builder()
+        String referenceKey = BotChatContext.ChatType.PRIVATE + groupId;
+        BotChatContext botChatContext = chatContexts.computeIfAbsent(referenceKey, k ->
+                BotChatContext.builder()
                         .chatId(groupId)
-                        .chatType(ChatContext.ChatType.PRIVATE)
+                        .chatType(BotChatContext.ChatType.PRIVATE)
                         .build()
         );
         // 调用连续对话方法
-        //String reply = arkDoubaoService.streamMultiChatWithDoubao(msgfix, chatContext.getMessages());
-        String reply = arkDoubaoService.multiChatWithDoubao(msgfix, chatContext);
+        //String reply = arkDoubaoService.streamMultiChatWithDoubao(msgfix, botChatContext.getMessages());
+        String reply = arkDoubaoService.multiChatWithDoubao(msgfix, botChatContext);
         event.replyAsync(reply);
         log.info("回复 -> 群聊[{}({})]: {}", groupNickname, groupId, reply);
     }
@@ -116,7 +115,7 @@ public class MessageEventListener {
         log.info("接收 <- 私聊 [{}({})] {}", friendNickname, friendId, msgFix);
 
         // 3️⃣ 查询数据库好友记录
-        FriendUser user = botContactService.getFriendUser(friendId);
+        BotChatContact user = botContactService.getFriendUser(friendId);
         if (user == null) {
             // 首次消息，创建好友记录
             botContactService.insertFriendUser(friendId, friendNickname);
@@ -126,15 +125,15 @@ public class MessageEventListener {
         botContactService.updateFriendUser(user,msgFix);
 
         // 7️⃣ 调用 AI 处理聊天
-        String referenceKey = ChatContext.ChatType.PRIVATE + friendId;
-        ChatContext chatContext = chatContexts.computeIfAbsent(referenceKey, k ->
-                ChatContext.builder()
+        String referenceKey = BotChatContext.ChatType.PRIVATE + friendId;
+        BotChatContext botChatContext = chatContexts.computeIfAbsent(referenceKey, k ->
+                BotChatContext.builder()
                         .chatId(friendId)
-                        .chatType(ChatContext.ChatType.PRIVATE)
+                        .chatType(BotChatContext.ChatType.PRIVATE)
                         .build()
         );
 
-        String reply = arkDoubaoService.multiChatWithDoubao(msgFix, chatContext);
+        String reply = arkDoubaoService.multiChatWithDoubao(msgFix, botChatContext);
         log.info("发送 -> {} - {}", event.getId(), reply);
         event.replyAsync(reply);
 

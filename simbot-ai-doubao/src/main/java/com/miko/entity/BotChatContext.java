@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatContext {
+public class BotChatContext {
     private String chatId;
     private ChatType chatType;
     private String messageId; // 对应previousResponseId

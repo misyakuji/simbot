@@ -3,7 +3,7 @@ package com.miko.service;
 import com.miko.affection.FavorabilityContext;
 import com.miko.affection.FavorabilityEngine;
 import com.miko.affection.FavorabilityResult;
-import com.miko.entity.FriendUser;
+import com.miko.entity.BotChatContact;
 import com.miko.mapper.BotContactMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class BotContactService {
      */
     
     public void insertFriendUser(String authorId, String remark) {
-        FriendUser user = new FriendUser();
+        BotChatContact user = new BotChatContact();
         // 设置Uid
         user.setUserId(Long.valueOf(authorId));
         // 默认初始好感度
@@ -75,12 +75,12 @@ public class BotContactService {
     }
 
     
-    public FriendUser getFriendUser(String authorId) {
+    public BotChatContact getFriendUser(String authorId) {
         return botContactMapper.getFriendUser(authorId);
     }
 
     
-    public void updateFriendUser(FriendUser user, String msgFix) {
+    public void updateFriendUser(BotChatContact user, String msgFix) {
         // 4️⃣ 构造好感度上下文
         FavorabilityContext ctx = FavorabilityContext.builder()
                 .currentFavorability(user.getFavorability())

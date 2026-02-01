@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class FriendUser {
+public class BotChatContact {
     private int id; // 排序id
     private Long userId;         // QQ号 / 用户唯一ID
     private Integer favorability; // 好感度

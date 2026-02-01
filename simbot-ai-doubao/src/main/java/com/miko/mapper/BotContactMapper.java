@@ -1,6 +1,6 @@
 package com.miko.mapper;
 
-import com.miko.entity.FriendUser;
+import com.miko.entity.BotChatContact;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
@@ -12,23 +12,23 @@ public interface BotContactMapper {
      * @return Integer
      */
     @Select("SELECT favorability " +
-            "FROM friend_user " +
-            "WHERE user_id = #{qqId}")
+            "FROM bot_chat_contact " +
+            "WHERE contact_id = #{qqId}")
     Integer selectFavorabilityByQqId(@Param("qqId") String qqId);
 
     /**
      * 初始化好友列表
      *
-     * @param user friend_user实体封装
+     * @param user bot_chat_contact实体封装
      */
-    @Insert("INSERT INTO friend_user " +
-            "(user_id, favorability, intimacy_level, talk_count, last_talk_time, mood, remark, " +
+    @Insert("INSERT INTO bot_chat_contact " +
+            "(contact_id, favorability, intimacy_level, talk_count, last_talk_time, mood, remark, " +
             "ai_persona, ai_model, ai_temperature, ai_memory_summary, create_time, update_time) " +
             "VALUES (" +
             "#{userId}, #{favorability}, #{intimacyLevel}, #{talkCount}, #{lastTalkTime}, #{mood}, #{remark}, " +
             "#{aiPersona}, #{aiModel}, #{aiTemperature}, #{aiMemorySummary}, #{createTime}, #{updateTime}" +
             ")")
-    void insertFriendUser(FriendUser user);
+    void insertFriendUser(BotChatContact user);
 
 
     /**
@@ -36,7 +36,7 @@ public interface BotContactMapper {
      * @param qqId 发送者QQ_ID
      * @param prompt 提示词
      */
-    @Update("UPDATE friend_user SET ai_persona = #{prompt} WHERE user_id = #{qqId}")
+    @Update("UPDATE bot_chat_contact SET ai_persona = #{prompt} WHERE contact_id = #{qqId}")
     void updateAiPrompt(@Param("qqId") String qqId,@Param("prompt") String prompt);
 
     /**
@@ -44,31 +44,31 @@ public interface BotContactMapper {
      * @param qqId 发送者QQ_ID
      * @return String
      */
-    @Select("select ai_persona from friend_user where user_id = #{qqId}")
+    @Select("select ai_persona from bot_chat_contact where contact_id = #{qqId}")
     String getFriendUserAiPersona(@Param("qqId")String qqId);
 
     /**
      * 更新好感度相关信息
-     * @param user FriendUser
+     * @param user BotChatContact
      */
-    @Update("UPDATE friend_user SET favorability = #{favorability}, intimacy_level = #{intimacyLevel}, " +
+    @Update("UPDATE bot_chat_contact SET favorability = #{favorability}, intimacy_level = #{intimacyLevel}, " +
             "talk_count = #{talkCount}, mood = #{mood}, last_talk_time = #{lastTalkTime} " +
-            "WHERE user_id = #{userId}")
-    void updateGoodFeeling(FriendUser user);
+            "WHERE contact_id = #{userId}")
+    void updateGoodFeeling(BotChatContact user);
 
     /**
      * 获取好友用户
      * @param qqId 发送者QQ_ID
-     * @return FriendUser
+     * @return BotChatContact
      */
-    @Select("SELECT * FROM friend_user WHERE user_id = #{qqId}")
-    FriendUser getFriendUser(@Param("qqId") String qqId);
+    @Select("SELECT * FROM bot_chat_contact WHERE contact_id = #{qqId}")
+    BotChatContact getFriendUser(@Param("qqId") String qqId);
 
     /**
      * 更新ai模型
      * @param qqId 发送者QQ_ID
      * @param targetModel 使用的AI模型
      */
-    @Update("UPDATE friend_user SET ai_model = #{targetModel} WHERE user_id = #{qqId}")
+    @Update("UPDATE bot_chat_contact SET ai_model = #{targetModel} WHERE contact_id = #{qqId}")
     void updateAiModel(@Param("qqId") String qqId,String targetModel);
 }

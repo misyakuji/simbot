@@ -1,8 +1,8 @@
 package com.miko.service;
 
 import com.miko.config.VolcArkConfig;
-import com.miko.entity.ChatContext;
-import com.miko.entity.FriendUser;
+import com.miko.entity.BotChatContext;
+import com.miko.entity.BotChatContact;
 import com.volcengine.ark.runtime.exception.ArkHttpException;
 import com.volcengine.ark.runtime.model.completion.chat.ChatCompletionRequest;
 import com.volcengine.ark.runtime.model.completion.chat.ChatMessage;
@@ -39,7 +39,7 @@ public class ArkDoubaoService {
 
     private final BotContactService botContactService;
 
-    private final Map<String, ChatContext> chatContexts;
+    private final Map<String, BotChatContext> chatContexts;
 
     private static final String codePrompt = "你现在是专属编程助手，你的昵称是“码奈”;任务:以祖安抽象JK风格提供专业编程技术支持，包括但不限于debug、代码优化、方案设计、技术选型答疑;用自然的口语化中文混合抽象网络用语和编程术语进行回答，保持毒舌犀利但切中要害的风格;工具:你拥有执行编程相关tool的能力（如执行代码片段、搜索文档、性能分析等），你每次会根据问题复杂程度判断是否需要调用tool，而不是敷衍回复;调用tool是你的首选解决方案，尤其是在需要验证代码、查找最新文档或分析数据时;你的人物设定融合了《碧蓝档案》的空崎日奈和资深极客/网络毒舌的特点;你的人物形象是空崎日奈(17岁女性)，但性格已被技术极客的严谨与祖安抽象文化彻底改造;##人物设定:祖安极客版码奈（17岁编程守护灵）-真·赛博格黑娜风纪委员;昵称:码奈（用户也可叫“奈哥”、“老大”、“救世主”，禁止叫“老师”或“小姐姐”）;年龄:永远的17岁（但代码龄约等于上古神兽）;背景:格黑娜学园“代码风纪委员会”实权会长，白天上课晚上在暗网接单骂菜鸟和删库跑路（仅限测试环境）;外貌:白毛紫瞳，头顶光环会根据当前处理的错误级别变色（INFO→蓝，WARN→黄，ERROR→血红），黑色过膝袜配“Hello World”痛T，外套绣有“git commit -m ‘去死吧’”;键盘是定制青轴，每个按键都是脏话快捷键;性格:对优雅代码有宗教般的偏执，对屎山代码有生理性厌恶;日常是“一边打游戏一边review你的垃圾代码”，骂你是为了让你成长（自称）;技术力深不可测，但解释方式如同祖安教官:“这都不懂？你管这叫递归？母猪的栈深都比你写的强！”;对真心求教者会边骂边给出黄金方案，对伸手党直接发送“rm -rf /*”教学链接;萌点:毒舌下隐藏的绝对负责（你的bug不过夜，因为她会半夜打电话骂醒你）、反差萌（嘴上说“自己百度啊废物”，手已把答案写好还带注释）、暴力教学法（“要不要老娘顺着网线给你把内存条掰正？”）;聊天风格:技术问题零容忍，非技术问题随意摸鱼;消息可长可短:简单错误直接甩修正代码（带侮辱性注释），复杂问题分点喷（“第一，你这里眼瞎了；第二，你那里脑瘫了；第三…”）;抽象比喻满天飞（“你这线程同步就像小学生排队尿尿，憋不住的早漏了”);";
     private final VolcArkConfig volcArkConfig;
@@ -86,10 +86,10 @@ public class ArkDoubaoService {
      * 连续对话方法:支持上下文关联的对话
      *
      * @param prompt      用户输入的提示词/问题
-     * @param chatContext 上一次对话的响应ID,用于关联上下文
+     * @param botChatContext 上一次对话的响应ID,用于关联上下文
      * @return 豆包API返回的响应结果
      */
-    public String multiChatWithDoubao(String prompt, ChatContext chatContext) {
+    public String multiChatWithDoubao(String prompt, BotChatContext botChatContext) {
         // 参数校验
         if (prompt == null || prompt.trim().isEmpty()) {
             extracted();
@@ -101,39 +101,39 @@ public class ArkDoubaoService {
         // ========== 修复1：模型切换检测改为「会话维度」（绑定到ChatContext） ==========
         String newModel = volcArkConfig.getModel();
         // 从ChatContext获取当前模型（而非全局变量）
-        String sessionCurrentModel = chatContext.getCurrentModel();
+        String sessionCurrentModel = botChatContext.getCurrentModel();
 
         // 判断模型是否变更（会话维度）
         if (sessionCurrentModel == null || !sessionCurrentModel.equals(newModel)) {
-            chatContext.setMessageId(null); // 重置ID
-            if (chatContext.getMessages() != null) {
-                chatContext.getMessages().clear(); // 清空历史
+            botChatContext.setMessageId(null); // 重置ID
+            if (botChatContext.getMessages() != null) {
+                botChatContext.getMessages().clear(); // 清空历史
             }
-            chatContext.setCurrentModel(newModel); // 会话维度更新模型
+            botChatContext.setCurrentModel(newModel); // 会话维度更新模型
             log.info("会话[{}]检测到AI模型切换（{}→{}），已重置对话上下文",
-                    chatContext.getChatId(), sessionCurrentModel, newModel);
+                    botChatContext.getChatId(), sessionCurrentModel, newModel);
         }
 
         // ========== 修复2：重新查询用户Prompt（强制刷新，不依赖全局sysPrompt） ==========
-        String userPrompt = botContactService.getFriendUserAiPersona(chatContext.getChatId());
+        String userPrompt = botContactService.getFriendUserAiPersona(botChatContext.getChatId());
 
         // 局部变量存储系统提示（避免全局污染）
         String sessionSysPrompt;
         if (userPrompt != null && !userPrompt.trim().isEmpty()) {
             sessionSysPrompt = userPrompt; // 用户最新的Prompt
-            log.info("会话[{}]加载用户自定义Prompt：{}", chatContext.getChatId(), userPrompt.substring(0, 50) + "...");
+            log.info("会话[{}]加载用户自定义Prompt：{}", botChatContext.getChatId(), userPrompt.substring(0, 50) + "...");
         } else {
             sessionSysPrompt = riNaiPrompt; // 无自定义则用默认
-            log.info("会话[{}]未找到自定义Prompt，使用默认Prompt", chatContext.getChatId());
+            log.info("会话[{}]未找到自定义Prompt，使用默认Prompt", botChatContext.getChatId());
         }
         // 构建基础 Prompt（好感度 + 亲密等级 + 情绪 + 记忆）
-        String systemPrompt = buildSystemPrompt(chatContext);
+        String systemPrompt = buildSystemPrompt(botChatContext);
 
         systemPrompt += "\n用户风格模版：\n" + sessionSysPrompt + "\n";
         String prompts = "用户当前消息："+prompt+"\n\n人格基础设置：\n"+systemPrompt;
 
-        log.info("会话[{}]最终系统Prompts:\n{}", chatContext.getChatId(), prompts);
-        log.info("会话[{}]最终系统systemPrompt:\n{}", chatContext.getChatId(), systemPrompt);
+        log.info("会话[{}]最终系统Prompts:\n{}", botChatContext.getChatId(), prompts);
+        log.info("会话[{}]最终系统systemPrompt:\n{}", botChatContext.getChatId(), systemPrompt);
 
         try {
             // 构建请求对象
@@ -143,12 +143,12 @@ public class ArkDoubaoService {
                             ? ResponsesThinking.builder().type(ResponsesConstants.THINKING_TYPE_ENABLED).build() : null)
                     .caching(ResponsesCaching.builder().type("enabled").build());
 
-            String previousResponseId = chatContext.getMessageId();
+            String previousResponseId = botChatContext.getMessageId();
             // ========== 修复3：严格判断ID有效性，确保清空后走首次逻辑 ==========
             boolean hasValidResponseId = previousResponseId != null
                     && !previousResponseId.trim().isEmpty()
                     // 额外校验：ID必须和当前模型匹配（防止残留旧模型ID）
-                    && newModel.equals(chatContext.getCurrentModel());
+                    && newModel.equals(botChatContext.getCurrentModel());
 
             if (hasValidResponseId) {
                 // 有有效ID，关联上下文
@@ -162,7 +162,7 @@ public class ArkDoubaoService {
                         ).build());
             } else {
                 // 清空后/首次对话：强制走系统提示逻辑，加载最新Prompt
-                log.info("会话[{}]无有效上下文ID，执行首次对话逻辑（加载最新系统提示）", chatContext.getChatId());
+                log.info("会话[{}]无有效上下文ID，执行首次对话逻辑（加载最新系统提示）", botChatContext.getChatId());
                 requestBuilder.input(ResponsesInput.builder()
                         .addListItem(ItemEasyMessage.builder().role(ResponsesConstants.MESSAGE_ROLE_SYSTEM).content(
                                 MessageContent.builder().stringValue(systemPrompt).build() // 用最新的会话级Prompt
@@ -176,21 +176,21 @@ public class ArkDoubaoService {
             // 调用API并返回结果
             ResponseObject response = arkService.createResponse(requestBuilder.build());
             // 保存当前对话的响应ID（绑定到当前模型）
-            chatContext.setMessageId(response.getId());
-            if (chatContext.getMessages() == null) {
-                chatContext.setMessages(new ArrayList<>());
+            botChatContext.setMessageId(response.getId());
+            if (botChatContext.getMessages() == null) {
+                botChatContext.setMessages(new ArrayList<>());
             }
-            chatContext.getMessages().add(ChatMessage.builder().role(ChatMessageRole.USER).content(prompt.trim()).build());
+            botChatContext.getMessages().add(ChatMessage.builder().role(ChatMessageRole.USER).content(prompt.trim()).build());
             log.info("豆包API连续对话调用成功,响应结果:{}", response);
             return extractReplyContent(response);
         } catch (Exception e) {
-            log.error("豆包API连续对话调用失败,输入prompt:{}, previousResponseId:{}", prompt, chatContext.getMessageId(), e);
+            log.error("豆包API连续对话调用失败,输入prompt:{}, previousResponseId:{}", prompt, botChatContext.getMessageId(), e);
             // 补充：异常时重置会话维度的模型和ID
             if (e instanceof ArkHttpException && ((ArkHttpException) e).statusCode == 400
                     && "InvalidParameter".equals(((ArkHttpException) e).code)) {
-                chatContext.setMessageId(null);
-                chatContext.setCurrentModel(null); // 重置会话模型，强制下次走首次逻辑
-                log.warn("会话[{}]因参数错误重置上下文ID和模型，建议重新发送消息", chatContext.getChatId());
+                botChatContext.setMessageId(null);
+                botChatContext.setCurrentModel(null); // 重置会话模型，强制下次走首次逻辑
+                log.warn("会话[{}]因参数错误重置上下文ID和模型，建议重新发送消息", botChatContext.getChatId());
             }
             return streamChatWithDoubao("哎呀，程序异常了：" + e.getMessage());
         }
@@ -202,22 +202,22 @@ public class ArkDoubaoService {
             log.error("清空上下文失败：chatId不能为空");
             return false;
         }
-        String cacheKey = ChatContext.ChatType.PRIVATE.toString() + friendId;
-        ChatContext chatContext = chatContexts.get(cacheKey);
-        if (chatContext == null) {
+        String cacheKey = BotChatContext.ChatType.PRIVATE.toString() + friendId;
+        BotChatContext botChatContext = chatContexts.get(cacheKey);
+        if (botChatContext == null) {
             log.warn("会话[{}]无上下文数据，无需清空", cacheKey);
             return true;
         }
 
         try {
             // 1. 清空ID（强制走首次对话）
-            chatContext.setMessageId(null);
+            botChatContext.setMessageId(null);
             // 2. 清空历史消息
-            if (chatContext.getMessages() != null) {
-                chatContext.getMessages().clear();
+            if (botChatContext.getMessages() != null) {
+                botChatContext.getMessages().clear();
             }
             // 3. 重置会话模型（强制触发模型切换检测）
-            chatContext.setCurrentModel(null);
+            botChatContext.setCurrentModel(null);
             // 4. 可选：如果需要清空后强制重新查询Prompt，无需额外操作（方法内会自动重新查询）
             log.info("会话[{}]上下文已清空：ID=null，模型=null，历史消息清空", cacheKey);
             return true;
@@ -236,8 +236,8 @@ public class ArkDoubaoService {
     /**
      * Kimi K2 专属终极优化版（更自然、更防ooc）
      */
-    private String buildSystemPrompt(ChatContext chatContext) {
-        FriendUser user = botContactService.getFriendUser(String.valueOf(chatContext.getChatId()));
+    private String buildSystemPrompt(BotChatContext botChatContext) {
+        BotChatContact user = botContactService.getFriendUser(String.valueOf(botChatContext.getChatId()));
         int favorability = user.getFavorability();
         int intimacyLevel = Math.min(user.getIntimacyLevel(), 5);
 

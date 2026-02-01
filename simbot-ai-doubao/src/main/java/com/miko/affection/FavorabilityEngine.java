@@ -1,6 +1,6 @@
 package com.miko.affection;
 
-import com.miko.entity.FriendUser;
+import com.miko.entity.BotChatContact;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -133,7 +133,7 @@ public class FavorabilityEngine {
     }
 
 
-    public boolean isFirstToday(FriendUser user) {
+    public boolean isFirstToday(BotChatContact user) {
         // 从未聊过天，一定是今天第一次
         LocalDateTime lastTalkTime = user.getLastTalkTime();
         if (lastTalkTime == null) {
