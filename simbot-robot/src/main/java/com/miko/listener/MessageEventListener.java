@@ -92,7 +92,7 @@ public class MessageEventListener {
         String referenceKey = ChatContext.ChatType.PRIVATE + groupId;
         ChatContext chatContext = chatContexts.computeIfAbsent(referenceKey, k ->
                 ChatContext.builder()
-                        .chatId(Identifies.of(groupId))
+                        .chatId(groupId)
                         .chatType(ChatContext.ChatType.PRIVATE)
                         .build()
         );
@@ -108,7 +108,7 @@ public class MessageEventListener {
         // 标记检查
         if (markingInspection(event)) return;
         // 好友ID
-        ID friendId = event.getAuthorId();
+        String friendId = event.getAuthorId().toString();
         // 好友昵称
         String friendNickname = event.getSourceEvent().getSender().getNickname();
         // 消息内容
@@ -116,17 +116,17 @@ public class MessageEventListener {
         log.info("接收 <- 私聊 [{}({})] {}", friendNickname, friendId, msgFix);
 
         // 3️⃣ 查询数据库好友记录
-        FriendUser user = botContactService.getFriendUser(String.valueOf(friendId));
+        FriendUser user = botContactService.getFriendUser(friendId);
         if (user == null) {
             // 首次消息，创建好友记录
-            botContactService.insertFriendUser(String.valueOf(friendId), friendNickname);
-            user = botContactService.getFriendUser(String.valueOf(friendId));
+            botContactService.insertFriendUser(friendId, friendNickname);
+            user = botContactService.getFriendUser(friendId);
         }
 
         botContactService.updateFriendUser(user,msgFix);
 
         // 7️⃣ 调用 AI 处理聊天
-        String referenceKey = ChatContext.ChatType.PRIVATE.toString() + friendId;
+        String referenceKey = ChatContext.ChatType.PRIVATE + friendId;
         ChatContext chatContext = chatContexts.computeIfAbsent(referenceKey, k ->
                 ChatContext.builder()
                         .chatId(friendId)

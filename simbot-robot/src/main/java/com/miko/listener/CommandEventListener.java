@@ -59,7 +59,7 @@ public class CommandEventListener {
         event.getContent().sendAsync(replyContent.toString());
 
         // 4. 标记中断（保持你原有逻辑）
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
 
@@ -74,7 +74,7 @@ public class CommandEventListener {
         Matcher matcher = Pattern.compile("^(?:/切换模型|/changeModel)(\\d+)$").matcher(cmd);
         if (!matcher.find()) {
             event.getContent().sendAsync("❌ 指令格式错误！正确格式：/切换模型1 或 /changeModel1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -83,7 +83,7 @@ public class CommandEventListener {
             modelIndex = Integer.parseInt(matcher.group(1)); // 提取序号（如 1、2）
         } catch (NumberFormatException e) {
             event.getContent().sendAsync("❌ 序号必须是数字！正确格式：/切换模型1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -91,14 +91,14 @@ public class CommandEventListener {
         if (modelIndex < 1 || modelIndex > modelList.size()) {
             String tip = String.format("❌ 序号超出范围！当前支持 1~%d 号模型", modelList.size());
             event.getContent().sendAsync(tip);
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
         String targetModel = modelList.get(modelIndex - 1);
         try {
             volcArkConfig.setModel(targetModel);
-            botContactService.updateAiModel(event.getAuthorId(),targetModel);
+            botContactService.updateAiModel(event.getAuthorId().toString(), targetModel);
             String successMsg = String.format("✅ 模型切换成功！\n当前模型：%s\n序号：%d", targetModel, modelIndex);
             event.getContent().sendAsync(successMsg);
             log.info("用户切换模型：{}（序号{}）", targetModel, modelIndex);
@@ -108,7 +108,7 @@ public class CommandEventListener {
         }
 
         // 5. 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -172,7 +172,7 @@ public class CommandEventListener {
             isDeepThinking = false;
         } else {
             event.getContent().sendAsync("❌ 指令格式错误！正确格式：/开启深度思考 或 /关闭深度思考");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -186,7 +186,7 @@ public class CommandEventListener {
             event.getContent().sendAsync("❌ 深度思考设置失败！原因：" + e.getMessage());
         }
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -200,7 +200,7 @@ public class CommandEventListener {
 
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -228,7 +228,7 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -242,7 +242,7 @@ public class CommandEventListener {
 
         if (!matcher.find()) {
             event.getContent().sendAsync("❌ 指令格式错误！正确格式：/删除对话1 或 /removeChat1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -251,7 +251,7 @@ public class CommandEventListener {
             chatIndex = Integer.parseInt(matcher.group(1)); // 提取对话序号
         } catch (NumberFormatException e) {
             event.getContent().sendAsync("❌ 序号必须是数字！正确格式：/删除对话1");
-            volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+            volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
             return;
         }
 
@@ -261,7 +261,7 @@ public class CommandEventListener {
 
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -270,7 +270,7 @@ public class CommandEventListener {
             if (chatIndex < 1 || chatIndex > chatList.size()) {
                 String tip = String.format("❌ 对话序号超出范围！当前共有 %d 个对话", chatList.size());
                 event.getContent().sendAsync(tip);
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -292,7 +292,7 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -305,7 +305,7 @@ public class CommandEventListener {
 
             if (response == null || response.getData() == null || response.getData().isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有好友数据");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -349,7 +349,7 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener
@@ -361,7 +361,7 @@ public class CommandEventListener {
 
             if (response == null || response.getData() == null || response.getData().isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有好友数据");
-                volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+                volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
                 return;
             }
 
@@ -398,7 +398,7 @@ public class CommandEventListener {
         }
 
         // 标记中断后续监听
-        volcArkConfig.getInterruptFlag().put(event.getId(), Boolean.TRUE);
+        volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
     }
 
     @Listener

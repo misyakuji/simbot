@@ -7,7 +7,6 @@ import com.miko.entity.FriendUser;
 import com.miko.mapper.BotContactMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import love.forte.simbot.common.id.ID;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BotContactServiceImpl implements BotContactService {
+public class BotContactService {
 
     private final BotContactMapper botContactMapper;
 
@@ -24,7 +23,7 @@ public class BotContactServiceImpl implements BotContactService {
      * 查询好感度
      * 不存在返回 null
      */
-    @Override
+    
     public Integer getFavorability(String authorId) {
         return botContactMapper.selectFavorabilityByQqId(authorId);
     }
@@ -32,7 +31,7 @@ public class BotContactServiceImpl implements BotContactService {
     /**
      * 初始化好友列表（首次见面）
      */
-    @Override
+    
     public void insertFriendUser(String authorId, String remark) {
         FriendUser user = new FriendUser();
         // 设置Uid
@@ -65,22 +64,22 @@ public class BotContactServiceImpl implements BotContactService {
         botContactMapper.insertFriendUser(user);
     }
 
-    @Override
+    
     public void updateAiPrompt(String authorId, String prompt) {
         botContactMapper.updateAiPrompt(authorId, prompt);
     }
 
-    @Override
-    public String getFriendUserAiPersona(ID chatId) {
-        return botContactMapper.getFriendUserAiPersona(String.valueOf(chatId));
+    
+    public String getFriendUserAiPersona(String chatId) {
+        return botContactMapper.getFriendUserAiPersona(chatId);
     }
 
-    @Override
+    
     public FriendUser getFriendUser(String authorId) {
         return botContactMapper.getFriendUser(authorId);
     }
 
-    @Override
+    
     public void updateFriendUser(FriendUser user, String msgFix) {
         // 4️⃣ 构造好感度上下文
         FavorabilityContext ctx = FavorabilityContext.builder()
@@ -111,8 +110,8 @@ public class BotContactServiceImpl implements BotContactService {
         botContactMapper.updateGoodFeeling(user);
     }
 
-    @Override
-    public void updateAiModel(ID authorId, String targetModel) {
+    
+    public void updateAiModel(String authorId, String targetModel) {
         botContactMapper.updateAiModel(String.valueOf(authorId), targetModel);
         log.info("用户 {} AI模型更新为 {}", authorId, targetModel);
     }

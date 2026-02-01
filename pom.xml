@@ -20,6 +20,7 @@
         <module>simbot-robot</module>
         <module>simbot-web</module>
         <module>simbot-common</module>
+        <module>simbot-ai-doubao</module>
     </modules>
 
     <properties>
@@ -95,6 +96,12 @@
             <dependency>
                 <groupId>com.miko</groupId>
                 <artifactId>simbot-stater</artifactId>
+                <version>${miko.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.miko</groupId>
+                <artifactId>simbot-ai-doubao</artifactId>
                 <version>${miko.version}</version>
             </dependency>
 

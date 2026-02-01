@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import love.forte.simbot.common.id.ID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ChatContext {
-    private ID chatId;
+    private String chatId;
     private ChatType chatType;
     private String messageId; // 对应previousResponseId
     private List<ChatMessage> messages; // 历史对话消息列表
