@@ -21,11 +21,6 @@ public class BotChatContext {
     // 新增：记录当前使用的模型（用于检测模型切换）
     private String currentModel;
 
-    public enum ChatType {
-        GROUP,
-        PRIVATE
-    }
-
     // ========== 核心：新增清空上下文的方法 ==========
     public void clearContext() {
         // 1. 清空上下文关联ID（关键：避免跨模型使用无效ID）
@@ -47,7 +42,6 @@ public class BotChatContext {
         System.out.println("会话[" + chatIdStr + "]的上下文已清空");
     }
 
-    // ========== 可选：新增单独清空ID/消息的便捷方法（按需使用） ==========
     /**
      * 仅清空上下文关联ID（保留历史消息）
      */
@@ -64,5 +58,10 @@ public class BotChatContext {
         } else {
             this.messages = new ArrayList<>();
         }
+    }
+
+    public enum ChatType {
+        GROUP,
+        PRIVATE
     }
 }

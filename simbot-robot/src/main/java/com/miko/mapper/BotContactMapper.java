@@ -8,6 +8,7 @@ public interface BotContactMapper {
 
     /**
      * 查询好友好感度，不存在返回 null
+     *
      * @param qqId 发送者QQ_ID
      * @return Integer
      */
@@ -33,22 +34,25 @@ public interface BotContactMapper {
 
     /**
      * 更新聊天风格Prompt
-     * @param qqId 发送者QQ_ID
+     *
+     * @param qqId   发送者QQ_ID
      * @param prompt 提示词
      */
     @Update("UPDATE friend_user SET ai_persona = #{prompt} WHERE user_id = #{qqId}")
-    void updateAiPrompt(@Param("qqId") String qqId,@Param("prompt") String prompt);
+    void updateAiPrompt(@Param("qqId") String qqId, @Param("prompt") String prompt);
 
     /**
      * 查询Prompt
+     *
      * @param qqId 发送者QQ_ID
      * @return String
      */
     @Select("select ai_persona from friend_user where user_id = #{qqId}")
-    String getFriendUserAiPersona(@Param("qqId")String qqId);
+    String getFriendUserAiPersona(@Param("qqId") String qqId);
 
     /**
      * 更新好感度相关信息
+     *
      * @param user BotChatContact
      */
     @Update("UPDATE friend_user SET favorability = #{favorability}, intimacy_level = #{intimacyLevel}, " +
@@ -58,6 +62,7 @@ public interface BotContactMapper {
 
     /**
      * 获取好友用户
+     *
      * @param qqId 发送者QQ_ID
      * @return BotChatContact
      */
@@ -66,9 +71,10 @@ public interface BotContactMapper {
 
     /**
      * 更新ai模型
-     * @param qqId 发送者QQ_ID
+     *
+     * @param qqId        发送者QQ_ID
      * @param targetModel 使用的AI模型
      */
     @Update("UPDATE friend_user SET ai_model = #{targetModel} WHERE user_id = #{qqId}")
-    void updateAiModel(@Param("qqId") String qqId,String targetModel);
+    void updateAiModel(@Param("qqId") String qqId, String targetModel);
 }

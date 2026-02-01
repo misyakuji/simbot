@@ -122,7 +122,7 @@ public class MessageEventListener {
             user = botContactService.getFriendUser(friendId);
         }
 
-        botContactService.updateFriendUser(user,msgFix);
+        botContactService.updateFriendUser(user, msgFix);
 
         // 7️⃣ 调用 AI 处理聊天
         String referenceKey = BotChatContext.ChatType.PRIVATE + friendId;

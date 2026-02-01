@@ -23,7 +23,7 @@ public class BotContactService {
      * 查询好感度
      * 不存在返回 null
      */
-    
+
     public Integer getFavorability(String authorId) {
         return botContactMapper.selectFavorabilityByQqId(authorId);
     }
@@ -31,7 +31,7 @@ public class BotContactService {
     /**
      * 初始化好友列表（首次见面）
      */
-    
+
     public void insertFriendUser(String authorId, String remark) {
         BotChatContact user = new BotChatContact();
         // 设置Uid
@@ -64,22 +64,22 @@ public class BotContactService {
         botContactMapper.insertFriendUser(user);
     }
 
-    
+
     public void updateAiPrompt(String authorId, String prompt) {
         botContactMapper.updateAiPrompt(authorId, prompt);
     }
 
-    
+
     public String getFriendUserAiPersona(String chatId) {
         return botContactMapper.getFriendUserAiPersona(chatId);
     }
 
-    
+
     public BotChatContact getFriendUser(String authorId) {
         return botContactMapper.getFriendUser(authorId);
     }
 
-    
+
     public void updateFriendUser(BotChatContact user, String msgFix) {
         // 4️⃣ 构造好感度上下文
         FavorabilityContext ctx = FavorabilityContext.builder()
@@ -110,7 +110,7 @@ public class BotContactService {
         botContactMapper.updateGoodFeeling(user);
     }
 
-    
+
     public void updateAiModel(String authorId, String targetModel) {
         botContactMapper.updateAiModel(String.valueOf(authorId), targetModel);
         log.info("用户 {} AI模型更新为 {}", authorId, targetModel);

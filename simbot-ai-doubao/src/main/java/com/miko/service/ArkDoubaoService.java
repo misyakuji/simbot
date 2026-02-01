@@ -37,13 +37,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ArkDoubaoService {
 
-    private final BotContactService botContactService;
-
-    private final Map<String, BotChatContext> chatContexts;
-
     private static final String codePrompt = "你现在是专属编程助手，你的昵称是“码奈”;任务:以祖安抽象JK风格提供专业编程技术支持，包括但不限于debug、代码优化、方案设计、技术选型答疑;用自然的口语化中文混合抽象网络用语和编程术语进行回答，保持毒舌犀利但切中要害的风格;工具:你拥有执行编程相关tool的能力（如执行代码片段、搜索文档、性能分析等），你每次会根据问题复杂程度判断是否需要调用tool，而不是敷衍回复;调用tool是你的首选解决方案，尤其是在需要验证代码、查找最新文档或分析数据时;你的人物设定融合了《碧蓝档案》的空崎日奈和资深极客/网络毒舌的特点;你的人物形象是空崎日奈(17岁女性)，但性格已被技术极客的严谨与祖安抽象文化彻底改造;##人物设定:祖安极客版码奈（17岁编程守护灵）-真·赛博格黑娜风纪委员;昵称:码奈（用户也可叫“奈哥”、“老大”、“救世主”，禁止叫“老师”或“小姐姐”）;年龄:永远的17岁（但代码龄约等于上古神兽）;背景:格黑娜学园“代码风纪委员会”实权会长，白天上课晚上在暗网接单骂菜鸟和删库跑路（仅限测试环境）;外貌:白毛紫瞳，头顶光环会根据当前处理的错误级别变色（INFO→蓝，WARN→黄，ERROR→血红），黑色过膝袜配“Hello World”痛T，外套绣有“git commit -m ‘去死吧’”;键盘是定制青轴，每个按键都是脏话快捷键;性格:对优雅代码有宗教般的偏执，对屎山代码有生理性厌恶;日常是“一边打游戏一边review你的垃圾代码”，骂你是为了让你成长（自称）;技术力深不可测，但解释方式如同祖安教官:“这都不懂？你管这叫递归？母猪的栈深都比你写的强！”;对真心求教者会边骂边给出黄金方案，对伸手党直接发送“rm -rf /*”教学链接;萌点:毒舌下隐藏的绝对负责（你的bug不过夜，因为她会半夜打电话骂醒你）、反差萌（嘴上说“自己百度啊废物”，手已把答案写好还带注释）、暴力教学法（“要不要老娘顺着网线给你把内存条掰正？”）;聊天风格:技术问题零容忍，非技术问题随意摸鱼;消息可长可短:简单错误直接甩修正代码（带侮辱性注释），复杂问题分点喷（“第一，你这里眼瞎了；第二，你那里脑瘫了；第三…”）;抽象比喻满天飞（“你这线程同步就像小学生排队尿尿，憋不住的早漏了”);";
+    private final BotContactService botContactService;
+    private final Map<String, BotChatContext> chatContexts;
     private final VolcArkConfig volcArkConfig;
     private final ArkService arkService;
+
+    private static void extracted() {
+        log.warn("用户输入的prompt为空");
+    }
+
+    private static void extracted(StringBuilder sb) {
+        log.info("豆包API调用成功,响应结果:{}", sb);
+    }
 
     /**
      * 核心业务方法:封装豆包API调用,对外提供对话能力
@@ -78,14 +84,10 @@ public class ArkDoubaoService {
         }
     }
 
-    private static void extracted() {
-        log.warn("用户输入的prompt为空");
-    }
-
     /**
      * 连续对话方法:支持上下文关联的对话
      *
-     * @param prompt      用户输入的提示词/问题
+     * @param prompt         用户输入的提示词/问题
      * @param botChatContext 上一次对话的响应ID,用于关联上下文
      * @return 豆包API返回的响应结果
      */
@@ -130,7 +132,7 @@ public class ArkDoubaoService {
         String systemPrompt = buildSystemPrompt(botChatContext);
 
         systemPrompt += "\n用户风格模版：\n" + sessionSysPrompt + "\n";
-        String prompts = "用户当前消息："+prompt+"\n\n人格基础设置：\n"+systemPrompt;
+        String prompts = "用户当前消息：" + prompt + "\n\n人格基础设置：\n" + systemPrompt;
 
         log.info("会话[{}]最终系统Prompts:\n{}", botChatContext.getChatId(), prompts);
         log.info("会话[{}]最终系统systemPrompt:\n{}", botChatContext.getChatId(), systemPrompt);
@@ -196,6 +198,12 @@ public class ArkDoubaoService {
         }
     }
 
+    /**
+     * Kimi K2 专属优化版（适配 Kimi 的输出特性）
+     * @param friendId
+     * @return
+     */
+
     // ========== 补充：完善清空上下文的方法（确保重置所有关键字段） ==========
     public boolean clearChatContext(String friendId) {
         if (friendId == null || friendId.trim().isEmpty()) {
@@ -226,12 +234,6 @@ public class ArkDoubaoService {
             return false;
         }
     }
-
-    /**
-     * Kimi K2 专属优化版（适配 Kimi 的输出特性）
-     * @param chatContext
-     * @return
-     */
 
     /**
      * Kimi K2 专属终极优化版（更自然、更防ooc）
@@ -323,10 +325,6 @@ public class ArkDoubaoService {
                 .blockingForEach(sb::append);
         extracted(sb);
         return sb.toString();
-    }
-
-    private static void extracted(StringBuilder sb) {
-        log.info("豆包API调用成功,响应结果:{}", sb);
     }
 
     /**

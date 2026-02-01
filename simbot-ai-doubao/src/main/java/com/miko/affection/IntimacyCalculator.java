@@ -6,15 +6,15 @@ package com.miko.affection;
 public class IntimacyCalculator {
     /**
      * 亲密等级计算规则
-     *
+     * <p>
      * 每一行规则表示：
-     *  favorability >= X  且  talkCount >= Y
-     *  就可以达到该亲密等级
-     *
+     * favorability >= X  且  talkCount >= Y
+     * 就可以达到该亲密等级
+     * <p>
      * 下标从 0 开始：
-     *  RULES[0] -> 1级
-     *  RULES[1] -> 2级
-     *  ...
+     * RULES[0] -> 1级
+     * RULES[1] -> 2级
+     * ...
      */
     private static final int[][] RULES = {
 

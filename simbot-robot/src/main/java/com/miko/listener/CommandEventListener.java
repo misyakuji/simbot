@@ -113,7 +113,7 @@ public class CommandEventListener {
 
     @Listener
     @Filter(
-            value =  "^(?:/设置聊天风格|/更新聊天风格|/changePersona)\\s*([\\s\\S]*)$",
+            value = "^(?:/设置聊天风格|/更新聊天风格|/changePersona)\\s*([\\s\\S]*)$",
             matchType = MatchType.REGEX_MATCHES
     )
     public void updateAiPersona(OneBotFriendMessageEvent event) {
