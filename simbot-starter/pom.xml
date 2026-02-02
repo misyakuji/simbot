@@ -12,23 +12,22 @@
     <artifactId>simbot-starter</artifactId>
 
     <dependencies>
-
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-mcp-server-napcat</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-robot</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-web</artifactId>
         </dependency>
-
-        <!-- spring-boot-starter -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter</artifactId>-->
-        <!--        </dependency>-->
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
