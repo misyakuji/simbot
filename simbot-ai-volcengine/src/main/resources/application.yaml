@@ -1,0 +1,13 @@
+spring:
+  ai:
+    openai:
+      # 你的火山方舟 API Key（sk-开头）
+      api-key: ${ARK_API_KEY}
+      # 火山方舟 OpenAI 兼容接口地址（固定）
+      base-url: https://ark.cn-beijing.volces.com/api/v3
+      # 火山方舟模型配置（控制台复制的模型名）
+      chat:
+        options:
+          model: doubao-seed-1-6-lite-251015
+          max-tokens: 8192
+          temperature: 0.7
