@@ -50,10 +50,6 @@
 <!--            <version>2.0.0-M2</version>-->
 <!--            <scope>compile</scope>-->
 <!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.miko</groupId>-->
-<!--            <artifactId>simbot-mcp-server-napcat</artifactId>-->
-<!--        </dependency>-->
         <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.ai</groupId>-->
