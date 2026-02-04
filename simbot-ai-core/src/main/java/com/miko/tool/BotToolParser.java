@@ -54,7 +54,7 @@ public class BotToolParser {
             for (BotToolMeta meta : metas) {
                 // 注册到 BotToolRegistry
                 registry.register(meta);
-                log.info("已注册工具：{}", meta.name());
+                log.info("(๑•̀ㅂ•́)و✧ Registered BotTool (≧∀≦)ゞ | FunctionName：{} Description：{} ,", meta.name(),meta.description());
             }
         }
     }
