@@ -1,6 +1,6 @@
 package com.miko.service;
 
-import com.miko.config.BotConfig; // 依赖抽象接口，而非具体类
+import com.miko.config.BotConfig;
 import com.miko.exception.ApiException;
 import com.miko.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,6 @@ public class BaseApiService {
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
     private final WebClient webClient; // 仍通过Spring注入
 
-    /**
-     * 核心改造：参数替换为BotConfig抽象接口
-     */
     public <T, R> R callApi(BotConfig botConfig, HttpMethod method, String path, T request, Class<R> responseClass,
                             Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
         try {
@@ -80,7 +77,6 @@ public class BaseApiService {
         }
     }
 
-    // 其他方法同步改造：将SimBotConfig替换为BotConfig
     public <T, R> Mono<R> callApiAsync(BotConfig botConfig, HttpMethod method, String path, T request, Class<R> responseClass) {
         return callApiAsync(botConfig, method, path, request, responseClass, null, null, DEFAULT_TIMEOUT_SECONDS);
     }
