@@ -1,16 +1,12 @@
 package com.miko.napcat.mcp.tool;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.miko.napcat.service.NapCatApiService;
 import com.miko.napcat.service.message.ext.SendGroupMsgService;
 import com.miko.service.SendGroupMsgRequest;
 import com.miko.service.SendGroupMsgResponse;
 import com.miko.tool.BotTool;
 import com.miko.tool.BotToolParam;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,30 +22,9 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class NapCatQqTools{
 
-    private final NapCatApiService napCatApiService;
     private final SendGroupMsgService sendGroupMsgService;
     WebClient webClient = WebClient.create();
 
-//    @Tool(name = "sendGroupAt",description = "在QQ群中@某个成员")
-//    public String sendGroupAt(@ToolParam(description = "QQ群号") String groupId,
-//                            @ToolParam(description = "被@的QQ号") String atQq) {
-//        log.error("🚨 sendGroupAt 被调用");
-//        SendGroupMsgRequest request = new SendGroupMsgRequest();
-//        request.setGroupId(groupId);
-//        request.setMessage(
-//                new SendGroupMsgRequest.Message(
-//                        "at",
-//                        new SendGroupMsgRequest.AtData(atQq, "string")
-//                )
-//        );
-//
-//        SendGroupMsgResponse resp = sendGroupMsgService.sendGroupAt(request);
-//        System.out.println(resp.getStatus());
-//        log.warn("NapCatQqTools——————sendGroupAt已被执行");
-//        return "NapCatQqTools——————sendGroupAt方法已被执行";
-//    }
-
-//    @Tool(name = "send_group_at", description = "在指定QQ群中@指定QQ号成员，发送群@消息")
     @BotTool(name = "send_group_at", description = "在指定QQ群中@指定QQ号成员，发送群@消息")
     public String sendGroupAt(@BotToolParam(name = "groupId") String groupId, @BotToolParam(name = "atQq") String atQq) {
         log.info("🚨 sendGroupAt 工具方法被成功调用，群号：{}，被@QQ：{}", groupId, atQq);
