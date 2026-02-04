@@ -1,6 +1,6 @@
 package com.miko.controller;
 
-import com.miko.ai.service.ChatService;
+import com.miko.ai.service.ArkChatService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 //@PropertySource(value = {"classpath:webInfo.properties"})
 public class TestController {
 
-    private final ChatService chatService;
+    private final ArkChatService chatService;
 
     @Value("${web.msg}")
     private String webMsg;
 
-    public TestController(ChatService chatService) {
+    public TestController(ArkChatService chatService) {
         this.chatService = chatService;
     }
 
