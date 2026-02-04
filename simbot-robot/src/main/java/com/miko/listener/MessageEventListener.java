@@ -1,5 +1,6 @@
 package com.miko.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.miko.ai.service.ArkChatService;
 import com.miko.entity.BotChatContext;
 import com.miko.manager.AiInterruptManager;
@@ -35,7 +36,7 @@ public class MessageEventListener {
     /**
      * 注入全局 对话上下文: key = 对话类型+群聊ID/好友ID+对话ID value = 该对话的上下文
      */
-    private Map<String, BotChatContext> chatContexts = new HashMap<>();
+    private final Map<String, BotChatContext> chatContexts = new HashMap<>();
 
     @Listener
     public void msgEvent(OneBotMessageEvent event) {
@@ -97,7 +98,7 @@ public class MessageEventListener {
     }
 
     @Listener(priority = PriorityConstant.DE_PRIORITIZE_1)
-    public void friendMsgEvent(OneBotFriendMessageEvent event) {
+    public void friendMsgEvent(OneBotFriendMessageEvent event) throws Exception {
         // 检查是否被标记中断，是则直接返回（不执行后续逻辑）
         if (CheckMarkBreak(event)) return;
         // 好友ID
@@ -128,7 +129,8 @@ public class MessageEventListener {
         );
 
 //        String reply = arkDoubaoService.multiChatWithDoubao(msgFix, botChatContext);
-        String reply = arkChatService.multiChatWithDoubao(msgFix, botChatContext);
+        String reply = arkChatService.aiCallGroupAt(msgFix);
+//        String reply = arkChatService.multiChatWithDoubao(msgFix, botChatContext);
         log.info("发送 -> {} - {}", event.getId(), reply);
         event.replyAsync(reply);
 
