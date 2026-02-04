@@ -22,6 +22,8 @@
         <module>simbot-common</module>
         <module>simbot-mcp-server-napcat</module>
         <module>simbot-ai-volcengine</module>
+        <module>simbot-bot-api</module>
+        <module>simbot-ai-core</module>
 
     </modules>
 
@@ -77,9 +79,10 @@
             </dependency>
             <dependency>
                 <groupId>com.miko</groupId>
-                <artifactId>simbot-ai</artifactId>
+                <artifactId>simbot-ai-core</artifactId>
                 <version>${miko.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.miko</groupId>
                 <artifactId>simbot-mcp-server-napcat</artifactId>
@@ -222,6 +225,21 @@
                             <artifactId>lombok</artifactId>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <!-- 添加spring-boot-maven-plugin -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!--
+                        JVM参数配置：启用原生访问权限
+                        该参数允许模块系统中的所有未命名模块访问原生方法和内部API，
+                        主要用于解决模块化系统中反射访问受限的问题
+                    -->
+                    <jvmArguments>
+                        --enable-native-access=ALL-UNNAMED
+                    </jvmArguments>
                 </configuration>
             </plugin>
         </plugins>
