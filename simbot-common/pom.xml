@@ -28,6 +28,12 @@
             <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-bot-api</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>
