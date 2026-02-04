@@ -18,7 +18,15 @@
         </dependency>
         <dependency>
             <groupId>com.miko</groupId>
+            <artifactId>simbot-ai-volcengine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.miko</groupId>
             <artifactId>simbot-robot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-ai-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.miko</groupId>
