@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
 
 /**
  * 火山方舟 ChatModel 适配器
@@ -69,11 +67,6 @@ public class ArkChatModelAdapter implements ChatModel {
     @Override
     public ChatResponse call(@NonNull Prompt prompt) {
         return strategy.call(prompt);
-    }
-
-    // ✅ 新增异步入口
-    public Mono<ChatResponse> reactiveCall(@NonNull Prompt prompt) {
-        return strategy.reactiveCall(prompt);
     }
 
 }
