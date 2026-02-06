@@ -50,4 +50,12 @@ public enum ArkApiMode {
         // 默认回退到聊天完成API模式（兼容旧版本接口）
         return CHAT_API;
     }
+
+    /**
+     * 获取当前枚举实例的API路径值
+     * @return API路径值
+     */
+    public String getValue() {
+        return value;
+    }
 }
