@@ -18,7 +18,7 @@ public class ArkChatConstants {
      * 默认API调用超时时间（秒）
      * 当未指定超时时间时使用的默认值
      */
-    public static final int DEFAULT_TIMEOUT_SECONDS = 15;
+    public static final int DEFAULT_TIMEOUT_SECONDS = 30;
 
     /**
      * 私有构造函数
