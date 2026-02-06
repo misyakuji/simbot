@@ -1,6 +1,8 @@
 package com.miko.tool;
 
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -21,6 +23,24 @@ public class BotToolExecutor {
      */
     public BotToolExecutor(BotToolRegistry registry) {
         this.registry = registry;
+    }
+    /*
+    2026.2.6 19:30 新增：测试异步调用
+     */
+    public Mono<BotToolResult> executeAsync(String toolName, Map<String, Object> args) {
+        BotToolMeta meta = registry.getTool(toolName)
+                .orElseThrow(() -> new RuntimeException("未找到工具: " + toolName));
+
+        return Mono.fromCallable(() -> {
+                    Object[] params = new Object[meta.params().size()];
+                    for (BotToolParamMeta p : meta.params()) {
+                        params[p.index()] = args.get(p.name());
+                    }
+                    return meta.method().invoke(meta.bean(), params);
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(BotToolResult::success)
+                .onErrorResume(e -> Mono.just(BotToolResult.failure(e.getMessage())));
     }
 
     /**
