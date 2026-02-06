@@ -17,18 +17,21 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+        <!-- 机器人API核心依赖 -->
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-bot-api</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Spring上下文支持 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>7.0.3</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Jakarta注解API -->
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
@@ -37,6 +40,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Reactor响应式编程核心库 -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
         </dependency>
     </dependencies>
 
