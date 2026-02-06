@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * 发送群消息相关服务
@@ -29,8 +30,13 @@ public class SendGroupMsgService implements GroupMsgSender {
      * @param request 请求对象
      * @return 响应对象
      */
-    public SendGroupMsgResponse sendGroupAt(SendGroupMsgRequest request) {
-        return napCatApiService.callNapCatApi(NapCatApiEnum.SEND_GROUP_AT, request, SendGroupMsgResponse.class);
+
+
+    /*
+    2026.2.6 19:30 新增：测试异步调用
+     */
+    public Mono<SendGroupMsgResponse> sendGroupAt(SendGroupMsgRequest request) {
+         return napCatApiService.callNapCatApiReactive(NapCatApiEnum.SEND_GROUP_AT, request, SendGroupMsgResponse.class);
     }
 
 }
