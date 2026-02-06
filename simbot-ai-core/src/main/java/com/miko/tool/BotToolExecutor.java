@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * BotTool执行器，负责根据工具名称和参数执行对应的工具方法。
+ * 支持同步和异步两种执行模式。
  */
 @Component
 public class BotToolExecutor {
@@ -24,8 +25,13 @@ public class BotToolExecutor {
     public BotToolExecutor(BotToolRegistry registry) {
         this.registry = registry;
     }
-    /*
-    2026.2.6 19:30 新增：测试异步调用
+
+    /**
+     * 异步执行指定工具
+     *
+     * @param toolName 工具名称
+     * @param args     参数映射，键为参数名，值为参数值
+     * @return Mono<BotToolResult> 工具执行结果的响应式流
      */
     public Mono<BotToolResult> executeAsync(String toolName, Map<String, Object> args) {
         BotToolMeta meta = registry.getTool(toolName)
@@ -44,11 +50,11 @@ public class BotToolExecutor {
     }
 
     /**
-     * 执行指定工具
+     * 同步执行指定工具
      *
-     * @param toolName 工具名
-     * @param args     参数 Map，键为参数名，值为参数值
-     * @return 方法返回值
+     * @param toolName 工具名称
+     * @param args     参数映射，键为参数名，值为参数值
+     * @return 工具方法的执行结果
      * @throws RuntimeException 当工具未找到或执行失败时抛出
      */
     public Object execute(String toolName, Map<String, Object> args) {
