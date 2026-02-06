@@ -1,5 +1,7 @@
 package com.miko.ai.service;
 
+import com.miko.ai.adapter.ArkChatModelAdapter;
+import com.miko.ai.strategy.ArkApiStrategy;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -15,6 +17,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -26,15 +29,17 @@ public class ArkChatServiceImpl implements ArkChatService {
 
     private final ChatClient chatClient;
     private final ChatModel chatModel;
+    private final ArkApiStrategy arkApiStrategy;
     // 固定前缀：定义标准化的工具执行标识
     private static final String TOOL_TRACE_PREFIX = "BOT_TOOL_EXEC";
 
-    public ArkChatServiceImpl(ChatClient.Builder builder, ChatModel chatModel) {
+    public ArkChatServiceImpl(ChatClient.Builder builder, ChatModel chatModel, ArkApiStrategy arkApiStrategy) {
         this.chatClient = builder.build();
         this.chatModel = chatModel;
+        this.arkApiStrategy = arkApiStrategy;
     }
 
-    public String chat(@RequestParam String prompt) {
+    public String chat2(@RequestParam String prompt) {
         String systemPrompt = """
                                   - 仅在用户明确要求使用工具时调用它。
                                   - 如果不需要使用工具，请直接以普通文本回答。
@@ -53,6 +58,97 @@ public class ArkChatServiceImpl implements ArkChatService {
         }
         return Objects.requireNonNull(Objects.requireNonNull(chatResponse).getResult()).getOutput().getText();
     }
+    public String chat(@RequestParam String prompt) {
+        String systemPrompt = """
+        - 仅在用户明确要求使用工具时调用它。
+        - 如果不需要使用工具，请直接以普通文本回答。
+        """;
+        String riNai = "你现在是一个群友,你的群昵称是“日奈”;任务:像普通群友一样聊天,...(省略长设定)";
+        // 构建 Spring AI Prompt
+        Prompt springPrompt = Prompt.builder()
+                .messages(
+                        new SystemMessage(systemPrompt),  // 系统消息
+                        new UserMessage(prompt)           // 用户消息
+                )
+                .build();
+
+        // 异步调用 ChatModel
+        Mono<ChatResponse> responseMono = chatModel instanceof ArkChatModelAdapter adapter
+                ? adapter.reactiveCall(springPrompt)
+                : Mono.error(new RuntimeException("ChatModel 不支持异步调用"));
+
+        // 处理工具调用并最终返回文本
+        String reply = responseMono
+                .flatMap(chatResponse -> {
+                    AssistantMessage message = chatResponse.getResult().getOutput();
+
+                    if (message.getText() != null && message.getText().contains(TOOL_TRACE_PREFIX)) {
+                        // 如果检测到工具调用标记，再次调用模型执行工具
+                        Prompt followUpPrompt = Prompt.builder()
+                                .messages(
+                                        new UserMessage(message.getText())
+                                )
+                                .build();
+                        return arkApiStrategy.reactiveCall(followUpPrompt)
+                                .map(followUpResponse -> {
+                                    AssistantMessage followUpMessage = followUpResponse.getResult().getOutput();
+                                    return followUpMessage.getText() != null ? followUpMessage.getText() : "";
+                                });
+                    } else {
+                        return Mono.just(message.getText() != null ? message.getText() : "");
+                    }
+                })
+                .onErrorResume(e -> Mono.just("接口异常: " + e.getMessage()))
+                .block(); // 最终返回同步结果
+
+        return reply;
+    }
+
+    public Mono<String> chat(String prompt, BotChatContext botChatContext) {
+        if (prompt == null || prompt.trim().isEmpty()) {
+            return Mono.error(new IllegalArgumentException("输入内容不能为空"));
+        }
+
+        // 构建 Spring AI Prompt
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage("你是一个聊天机器人，同时拥有工具能力..."));
+
+        if (botChatContext.getMessages() != null) {
+            for (ChatMessage history : botChatContext.getMessages()) {
+                if (history.getRole() == ChatMessage.ChatMessageRole.USER) {
+                    messages.add(new UserMessage((String) history.getContent()));
+                } else if (history.getRole() == ChatMessage.ChatMessageRole.ASSISTANT) {
+                    messages.add(new AssistantMessage((String) history.getContent()));
+                }
+            }
+        }
+        messages.add(new UserMessage(prompt.trim()));
+
+        Prompt springPrompt = Prompt.builder().messages(messages).build();
+
+        // 异步调用 ChatModel
+        return chatModel instanceof ArkChatModelAdapter adapter
+                ? adapter.reactiveCall(springPrompt)
+                .flatMap(chatResponse -> {
+                    String reply = chatResponse.getResult() != null
+                            ? chatResponse.getResult().getOutput().getText()
+                            : "";
+
+                    // 保存会话历史
+                    if (botChatContext.getMessages() == null) {
+                        botChatContext.setMessages(new ArrayList<>());
+                    }
+                    botChatContext.getMessages().add(ChatMessage.builder()
+                            .role(ChatMessage.ChatMessageRole.USER).content(prompt.trim()).build());
+                    botChatContext.getMessages().add(ChatMessage.builder()
+                            .role(ChatMessage.ChatMessageRole.ASSISTANT).content(reply).build());
+
+                    return Mono.just(reply);
+                })
+                .onErrorResume(e -> Mono.just("调用异常: " + e.getMessage()))
+                : Mono.error(new RuntimeException("ChatModel 不支持异步调用"));
+    }
+
 
     public String multiChatWithDoubao(String prompt, BotChatContext botChatContext) {
         // 参数校验
