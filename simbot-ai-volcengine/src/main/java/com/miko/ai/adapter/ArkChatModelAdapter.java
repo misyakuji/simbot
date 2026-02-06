@@ -71,13 +71,9 @@ public class ArkChatModelAdapter implements ChatModel {
         return strategy.call(prompt);
     }
 
-    /**
-     * 响应式调用方法，供上层服务异步使用
-     *
-     * @param prompt 聊天提示信息
-     * @return 响应式聊天结果
-     */
-    public Mono<ChatResponse> reactiveCall(Prompt prompt) {
+    // ✅ 新增异步入口
+    public Mono<ChatResponse> reactiveCall(@NonNull Prompt prompt) {
         return strategy.reactiveCall(prompt);
     }
+
 }
