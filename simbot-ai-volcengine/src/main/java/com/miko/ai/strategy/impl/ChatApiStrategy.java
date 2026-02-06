@@ -82,7 +82,7 @@ public class ChatApiStrategy implements ArkApiStrategy {
 
         // 发送POST请求到火山引擎API
         return webClient.post()
-                .uri(baseUrl + ArkApiMode.CHAT_API)
+                .uri(baseUrl + ArkApiMode.CHAT_API.getValue())
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(ArkChatResponse.class)
