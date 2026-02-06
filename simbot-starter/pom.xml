@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.miko</groupId>
-            <artifactId>simbot-mcp-server-napcat</artifactId>
+            <artifactId>simbot-napcat</artifactId>
         </dependency>
         <dependency>
             <groupId>com.miko</groupId>
@@ -27,6 +27,10 @@
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-ai-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-bot-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.miko</groupId>
