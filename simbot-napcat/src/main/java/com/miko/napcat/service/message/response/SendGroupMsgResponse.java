@@ -1,4 +1,4 @@
-package com.miko.service;
+package com.miko.napcat.service.message.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
