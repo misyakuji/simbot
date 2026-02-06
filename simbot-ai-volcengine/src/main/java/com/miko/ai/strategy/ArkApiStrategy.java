@@ -6,28 +6,20 @@ import org.springframework.ai.chat.prompt.Prompt;
 import reactor.core.publisher.Mono;
 
 /**
- * 火山方舟API调用策略接口
- * 定义了不同API模式下的统一调用规范
+ * 火山方舟API调用接口
+ * 定义了与火山方舟AI服务交互的通用方法
  */
 public interface ArkApiStrategy {
-
     /**
-     * 同步方式调用AI模型
-     * @param prompt 聊天提示信息
-     * @return 聊天响应结果
+     * 同步调用火山方舟AI服务
+     * @param prompt 包含用户输入和上下文的提示信息
+     * @return ChatResponse AI服务返回的聊天响应
      */
     ChatResponse call(Prompt prompt);
 
     /**
-     * 响应式方式调用AI模型
-     * @param prompt 聊天提示信息
-     * @return 响应式聊天响应结果
-     */
-    Mono<ChatResponse> reactiveCall(Prompt prompt);
-
-    /**
-     * 获取当前策略实现所支持的API模式
-     * @return 支持的ArkApiMode枚举值
+     * 获取当前策略支持的API模式
+     * @return ArkApiMode 返回该策略支持的API模式枚举值
      */
     ArkApiMode getSupportMode();
 }
