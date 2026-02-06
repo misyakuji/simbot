@@ -1,4 +1,4 @@
-package com.miko.service;
+package com.miko.napcat.service;
 
 import com.miko.config.BotConfig;
 import com.miko.exception.ApiException;
@@ -16,13 +16,39 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Map;
 
+/**
+ * 基础API服务类，提供同步和异步的HTTP请求功能
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BaseApiService {
+    /**
+     * 默认超时时间（秒）
+     */
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
-    private final WebClient webClient; // 仍通过Spring注入
+    
+    /**
+     * WebClient实例，用于发送HTTP请求
+     */
+    private final WebClient webClient;
 
+    /**
+     * 同步调用API方法
+     *
+     * @param botConfig      机器人配置信息
+     * @param method         HTTP请求方法
+     * @param path           API路径
+     * @param request        请求体对象
+     * @param responseClass  响应数据类型
+     * @param headers        请求头信息
+     * @param queryParams    查询参数
+     * @param timeoutSeconds 超时时间（秒）
+     * @param <T>            请求体类型
+     * @param <R>            响应体类型
+     * @return 响应结果对象
+     * @throws ApiException API调用异常
+     */
     public <T, R> R callApi(BotConfig botConfig, HttpMethod method, String path, T request, Class<R> responseClass,
                             Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
         try {
@@ -77,10 +103,37 @@ public class BaseApiService {
         }
     }
 
+    /**
+     * 异步调用API方法（使用默认参数）
+     *
+     * @param botConfig     机器人配置信息
+     * @param method        HTTP请求方法
+     * @param path          API路径
+     * @param request       请求体对象
+     * @param responseClass 响应数据类型
+     * @param <T>           请求体类型
+     * @param <R>           响应体类型
+     * @return 响应结果的Mono流
+     */
     public <T, R> Mono<R> callApiAsync(BotConfig botConfig, HttpMethod method, String path, T request, Class<R> responseClass) {
         return callApiAsync(botConfig, method, path, request, responseClass, null, null, DEFAULT_TIMEOUT_SECONDS);
     }
 
+    /**
+     * 异步调用API方法
+     *
+     * @param botConfig      机器人配置信息
+     * @param method         HTTP请求方法
+     * @param path           API路径
+     * @param request        请求体对象
+     * @param responseClass  响应数据类型
+     * @param headers        请求头信息
+     * @param queryParams    查询参数
+     * @param timeoutSeconds 超时时间（秒）
+     * @param <T>            请求体类型
+     * @param <R>            响应体类型
+     * @return 响应结果的Mono流
+     */
     public <T, R> Mono<R> callApiAsync(BotConfig botConfig, HttpMethod method, String path, T request, Class<R> responseClass,
                                        Map<String, String> headers, Map<String, String> queryParams, int timeoutSeconds) {
         try {
@@ -140,26 +193,90 @@ public class BaseApiService {
         }
     }
 
+    /**
+     * GET请求方法（无查询参数）
+     *
+     * @param botConfig     机器人配置信息
+     * @param path          API路径
+     * @param responseClass 响应数据类型
+     * @param <R>           响应体类型
+     * @return 响应结果对象
+     */
     public <R> R get(BotConfig botConfig, String path, Class<R> responseClass) {
         return callApi(botConfig, HttpMethod.GET, path, null, responseClass, null, null, DEFAULT_TIMEOUT_SECONDS);
     }
 
+    /**
+     * GET请求方法（带查询参数）
+     *
+     * @param botConfig     机器人配置信息
+     * @param path          API路径
+     * @param queryParams   查询参数
+     * @param responseClass 响应数据类型
+     * @param <R>           响应体类型
+     * @return 响应结果对象
+     */
     public <R> R get(BotConfig botConfig, String path, Map<String, String> queryParams, Class<R> responseClass) {
         return callApi(botConfig, HttpMethod.GET, path, null, responseClass, null, queryParams, DEFAULT_TIMEOUT_SECONDS);
     }
 
+    /**
+     * POST请求方法
+     *
+     * @param botConfig     机器人配置信息
+     * @param path          API路径
+     * @param request       请求体对象
+     * @param responseClass 响应数据类型
+     * @param <T>           请求体类型
+     * @param <R>           响应体类型
+     * @return 响应结果对象
+     */
     public <T, R> R post(BotConfig botConfig, String path, T request, Class<R> responseClass) {
         return callApi(botConfig, HttpMethod.POST, path, request, responseClass, null, null, DEFAULT_TIMEOUT_SECONDS);
     }
 
+    /**
+     * PUT请求方法
+     *
+     * @param botConfig     机器人配置信息
+     * @param path          API路径
+     * @param request       请求体对象
+     * @param responseClass 响应数据类型
+     * @param <T>           请求体类型
+     * @param <R>           响应体类型
+     * @return 响应结果对象
+     */
     public <T, R> R put(BotConfig botConfig, String path, T request, Class<R> responseClass) {
         return callApi(botConfig, HttpMethod.PUT, path, request, responseClass, null, null, DEFAULT_TIMEOUT_SECONDS);
     }
 
+    /**
+     * DELETE请求方法
+     *
+     * @param botConfig     机器人配置信息
+     * @param path          API路径
+     * @param request       请求体对象
+     * @param responseClass 响应数据类型
+     * @param <T>           请求体类型
+     * @param <R>           响应体类型
+     * @return 响应结果对象
+     */
     public <T, R> R delete(BotConfig botConfig, String path, T request, Class<R> responseClass) {
         return callApi(botConfig, HttpMethod.DELETE, path, request, responseClass, null, null, DEFAULT_TIMEOUT_SECONDS);
     }
 
+    /**
+     * 通用API调用方法（使用默认参数）
+     *
+     * @param botConfig     机器人配置信息
+     * @param method        HTTP请求方法
+     * @param path          API路径
+     * @param request       请求体对象
+     * @param responseClass 响应数据类型
+     * @param <T>           请求体类型
+     * @param <R>           响应体类型
+     * @return 响应结果对象
+     */
     public <T, R> R callApi(BotConfig botConfig, HttpMethod method, String path, T request, Class<R> responseClass) {
         return callApi(botConfig, method, path, request, responseClass, null, null, DEFAULT_TIMEOUT_SECONDS);
     }
