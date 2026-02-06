@@ -44,7 +44,7 @@ public class ArkChatModelAdapter implements ChatModel {
     /**
      * API调用超时时间，防止block()无限阻塞线程
      */
-    private static final Duration TIMEOUT = Duration.ofSeconds(50);
+    private static final Duration TIMEOUT = Duration.ofSeconds(15);
     private static final Logger log = LoggerFactory.getLogger(ArkChatModelAdapter.class);
 
     /**
@@ -146,6 +146,11 @@ public class ArkChatModelAdapter implements ChatModel {
                     .bodyToMono(ArkChatResponse.class)
                     // 设置同步阻塞超时时间
                     .block(TIMEOUT);
+            // 新增：处理block返回null（超时/无响应）场景
+            if (arkResponse == null) {
+                log.error("火山方舟接口调用超时，未获取到响应");
+                return buildFallbackChatResponse("请求超时，请稍后再试~");
+            }
         } catch (WebClientResponseException e) {
             // 捕获HTTP状态码异常（4xx/5xx），抛出携带详细信息的异常
             throw new RuntimeException("火山方舟API调用失败，状态码：" + e.getStatusCode() + "，响应内容：" + e.getResponseBodyAsString(), e);
@@ -162,7 +167,17 @@ public class ArkChatModelAdapter implements ChatModel {
                 .metadata("model", "volc-ark-" + model)
                 .build();
     }
-
+    /**
+     * 构造降级响应，保证接口正常返回
+     */
+    private ChatResponse buildFallbackChatResponse(String fallbackText) {
+        AssistantMessage fallbackMessage = new AssistantMessage(fallbackText);
+        Generation generation = new Generation(fallbackMessage);
+        return ChatResponse.builder()
+                .generations(List.of(generation))
+                .metadata("fallback", true)
+                .build();
+    }
     /**
      * 将 ArkChatResponse 转换为 Spring AI Generation 对象。
      * 该方法支持处理包含工具调用的响应，并自动执行工具调用，将结果封装到生成对象中。
