@@ -11,6 +11,7 @@ import com.miko.ai.strategy.ArkApiStrategy;
 import com.miko.ai.util.ArkSchemaBuilder;
 import com.miko.tool.BotToolExecutor;
 import com.miko.tool.BotToolRegistry;
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -24,6 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 聊天API策略实现类，负责处理与火山引擎Ark模型的交互。
+ * 支持同步和异步调用，并能处理工具调用。
+ */
+@RequiredArgsConstructor
 public class ChatApiStrategy implements ArkApiStrategy {
     private final WebClient webClient;
     private final String baseUrl;
@@ -32,16 +38,12 @@ public class ChatApiStrategy implements ArkApiStrategy {
     private final BotToolExecutor botToolExecutor;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ChatApiStrategy(WebClient webClient, String baseUrl, String model,
-                           BotToolRegistry botToolRegistry, BotToolExecutor botToolExecutor) {
-        this.webClient = webClient;
-        this.baseUrl = baseUrl;
-        this.model = model;
-        this.botToolRegistry = botToolRegistry;
-        this.botToolExecutor = botToolExecutor;
-    }
-
-    /** 同步调用 */
+    /**
+     * 同步调用方法，阻塞等待响应结果。
+     *
+     * @param prompt 用户输入的提示信息
+     * @return 聊天响应对象
+     */
     @Override
     public ChatResponse call(Prompt prompt) {
         return reactiveCall(prompt)
@@ -49,13 +51,18 @@ public class ChatApiStrategy implements ArkApiStrategy {
                 .block(); // 阻塞返回
     }
 
-    /** 异步响应式调用 */
+    /**
+     * 异步响应式调用方法，返回Mono类型的响应。
+     *
+     * @param prompt 用户输入的提示信息
+     * @return Mono类型的聊天响应
+     */
     @Override
     public Mono<ChatResponse> reactiveCall(Prompt prompt) {
-        // 转换消息
+        // 将Spring AI的Prompt转换为Ark模型可识别的消息格式
         List<Map<String, String>> arkMessages = ArkMessageConverter.convertToArkMessages(prompt);
 
-        // 构建工具JSON
+        // 构建工具定义的JSON结构
         List<Map<String, Object>> toolsJson = botToolRegistry.getAllTools().stream()
                 .map(meta -> Map.of(
                         "type", "function",
@@ -67,7 +74,7 @@ public class ChatApiStrategy implements ArkApiStrategy {
                 ))
                 .toList();
 
-        // 请求体
+        // 构建请求体
         Map<String, Object> requestBody = Map.of(
                 "model", model,
                 "messages", arkMessages,
@@ -92,12 +99,22 @@ public class ChatApiStrategy implements ArkApiStrategy {
                 });
     }
 
+    /**
+     * 获取支持的API模式。
+     *
+     * @return 支持的Ark API模式
+     */
     @Override
     public ArkApiMode getSupportMode() {
         return ArkApiMode.CHAT_API;
     }
 
-    /** 同步解析响应并执行工具 */
+    /**
+     * 解析Ark模型的响应并执行相关工具。
+     *
+     * @param arkResponse Ark模型的原始响应
+     * @return 处理后的聊天响应
+     */
     private ChatResponse parseResponse(ArkChatResponse arkResponse) {
         ArkChatResponse.Choice firstChoice = arkResponse.getChoices().getFirst();
         ArkChatResponse.Message message = firstChoice.getMessage();
@@ -116,7 +133,12 @@ public class ChatApiStrategy implements ArkApiStrategy {
                 .build();
     }
 
-    /** 同步执行工具调用 */
+    /**
+     * 处理工具调用，同步执行所有工具并收集结果。
+     *
+     * @param message 包含工具调用信息的消息对象
+     * @return 包含工具执行结果的助理消息
+     */
     private AssistantMessage handleToolCalls(ArkChatResponse.Message message) {
         List<AssistantMessage.ToolCall> toolCalls = new ArrayList<>();
         List<Map<String, Object>> results = new ArrayList<>();
