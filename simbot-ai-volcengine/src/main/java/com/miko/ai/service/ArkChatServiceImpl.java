@@ -34,7 +34,7 @@ public class ArkChatServiceImpl implements ArkChatService {
         this.chatModel = chatModel;
     }
 
-    public String aiCallGroupAt(@RequestParam String prompt) {
+    public String chat(@RequestParam String prompt) {
         String systemPrompt = """
                                   - 仅在用户明确要求使用工具时调用它。
                                   - 如果不需要使用工具，请直接以普通文本回答。
@@ -52,11 +52,6 @@ public class ArkChatServiceImpl implements ArkChatService {
             log.warn("二次回写模型成功！");
         }
         return Objects.requireNonNull(Objects.requireNonNull(chatResponse).getResult()).getOutput().getText();
-    }
-
-    @Override
-    public String chat(String prompt) {
-        return "";
     }
 
     public String multiChatWithDoubao(String prompt, BotChatContext botChatContext) {
