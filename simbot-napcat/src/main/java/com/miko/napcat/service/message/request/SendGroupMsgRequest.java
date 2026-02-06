@@ -1,4 +1,4 @@
-package com.miko.service;
+package com.miko.napcat.service.message.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
