@@ -12,30 +12,17 @@
     <artifactId>simbot-starter</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.miko</groupId>
-            <artifactId>simbot-napcat</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.miko</groupId>
-            <artifactId>simbot-ai-volcengine</artifactId>
-        </dependency>
+        <!-- 核心模块依赖 -->
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-robot</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.miko</groupId>
-            <artifactId>simbot-ai-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.miko</groupId>
-            <artifactId>simbot-bot-api</artifactId>
-        </dependency>
+        <!-- Web模块依赖 -->
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-web</artifactId>
         </dependency>
+        <!-- Spring Boot启动器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
