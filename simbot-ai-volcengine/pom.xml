@@ -17,14 +17,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-        <!-- Spring AI 聊天客户端依赖 -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-client-chat</artifactId>-->
-<!--            <version>2.0.0-M2</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
-
         <!-- Spring AI OpenAI 模型启动器依赖 -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
@@ -32,42 +24,15 @@
             <version>2.0.0-M2</version>
             <scope>compile</scope>
         </dependency>
-
-        <!-- Simbot 通用模块依赖 -->
-        <dependency>
-            <groupId>com.miko</groupId>
-            <artifactId>simbot-common</artifactId>
-        </dependency>
-
         <!-- Simbot AI 核心模块依赖 -->
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-ai-core</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-chat-memory</artifactId>-->
-<!--        </dependency>-->
-
-        <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client-webflux -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>-->
-<!--            <version>2.0.0-M2</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
-        <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-starter-mcp-client</artifactId>-->
-<!--            <version>2.0.0-M2</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-web</artifactId>-->
-        <!--        </dependency>-->
+        <!-- Simbot 工具模块依赖，用于AI调用自定义工具TOOL -->
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-tool</artifactId>
+        </dependency>
     </dependencies>
 </project>
