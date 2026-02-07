@@ -3,12 +3,14 @@ package com.miko.tool;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -68,7 +70,6 @@ public class BotToolParser {
     public List<BotToolMeta> parse(Object bean) {
         // 初始化用于存储解析结果的列表
         List<BotToolMeta> tools = new ArrayList<>();
-
         // 获取对象的类信息及其声明的所有方法
         Class<?> clazz = bean.getClass();
         Method[] methods = clazz.getDeclaredMethods();
