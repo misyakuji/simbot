@@ -1,0 +1,13 @@
+#spring:
+#  ai:
+#    mcp:
+#      server:
+#        enabled: true
+#        sse-message-endpoint: /mcp/events
+##        endpoint: /mcp
+##        ssePath: /events  # 这里决定 SSE 的 URL
+logging:
+  level:
+    org.springframework.ai: DEBUG
+    org.springframework.ai.tool: DEBUG
+    org.springframework.ai.chat: TRACE

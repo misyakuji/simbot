@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.miko</groupId>
+        <artifactId>simbot</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>simbot-napcat</artifactId>
+
+    <properties>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-bot-api</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.miko</groupId>
+            <artifactId>simbot-ai-core</artifactId>
+        </dependency>
+        <!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-spring-boot-autoconfigure</artifactId>-->
+<!--            <version>1.0.0-M6</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+        <!-- Spring AI MCP Server 核心依赖 -->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-mcp-server</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>-->
+<!--        </dependency>-->
+
+    </dependencies>
+
+</project>

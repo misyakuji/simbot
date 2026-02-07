@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.miko</groupId>
+        <artifactId>simbot</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>simbot-ai</artifactId>
+
+    <properties>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>2.0.0-M2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+
+
+        <!-- Spring AI 核心（可省，但我建议写） -->
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-client-chat -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-client-chat</artifactId>
+            <version>2.0.0-M2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/dev.langchain4j/langchain4j-mcp -->
+<!--        <dependency>-->
+<!--            <groupId>dev.langchain4j</groupId>-->
+<!--            <artifactId>langchain4j-mcp</artifactId>-->
+<!--            <version>1.10.0-beta18</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+        <!-- MCP Client（关键） -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-client</artifactId>
+        </dependency>
+
+        <!-- 你用的模型（示例 OpenAI / Doubao / Qwen 自选） -->
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-openai -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+            <version>2.0.0-M2</version>
+            <scope>compile</scope>
+        </dependency>
+
+
+
+<!--        &lt;!&ndash; ===================== 核心基础依赖（必引） ===================== &ndash;&gt;-->
+<!--        &lt;!&ndash; 1. Spring Boot 基础（上下文、自动配置） &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; 2. Spring AI 核心（统一 AiClient 接口、消息模型） &ndash;&gt;-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-client-chat &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-client-chat</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+
+
+
+
+
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-mcp-server</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-autoconfigure-model-tool &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-autoconfigure-model-tool</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; ===================== 模型适配依赖（二选一，核心） ===================== &ndash;&gt;-->
+<!--        &lt;!&ndash; 选项A：对接豆包（火山引擎 Ark）【你当前在用】 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-volcengine-ark-spring-boot-starter</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; 选项B：对接 DeepSeek（低成本备选，注释掉另一个即可） &ndash;&gt;-->
+<!--        &lt;!&ndash;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-model-deepseek</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+<!--        &ndash;&gt;-->
+
+<!--        &lt;!&ndash; ===================== 高阶能力依赖（必引，核心功能） ===================== &ndash;&gt;-->
+<!--        &lt;!&ndash; 1. 函数调用（AI 调用你的业务方法：查好感度、清上下文） &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-function-calling</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; 2. 提示词模板（简化 JK 人设 Prompt 构建，避免手动拼接） &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-prompt-templates</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; 3. 流式响应（打字机效果，提升真人聊天感） &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-streaming</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; ===================== 可选扩展依赖（按需引入） ===================== &ndash;&gt;-->
+<!--        &lt;!&ndash; 1. 向量数据库（Redis 轻量版，实现 AI 长期记忆） &ndash;&gt;-->
+<!--        &lt;!&ndash;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-vector-store-redis</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+<!--        &ndash;&gt;-->
+
+<!--        &lt;!&ndash; 2. 多模态（图片/语音交互，暂时不用可注释） &ndash;&gt;-->
+<!--        &lt;!&ndash;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-multimodal-core</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+<!--        &ndash;&gt;-->
+
+<!--        &lt;!&ndash; 3. 依赖 simbot-common（共用 DTO/接口，解耦 robot 模块） &ndash;&gt;-->
+<!--&lt;!&ndash;        <dependency>&ndash;&gt;-->
+<!--&lt;!&ndash;            <groupId>com.your.project</groupId>&ndash;&gt;-->
+<!--&lt;!&ndash;            <artifactId>simbot-common</artifactId>&ndash;&gt;-->
+<!--&lt;!&ndash;            <version>1.0.0</version>&ndash;&gt;-->
+<!--&lt;!&ndash;        </dependency>&ndash;&gt;-->
+
+<!--        &lt;!&ndash; 4. 测试依赖（单元测试 AI 能力，可选） &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-test</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+
+
+
+
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-autoconfigure-model-embedding-observation &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-autoconfigure-model-embedding-observation</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-azure-openai &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-azure-openai</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client-webflux &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-openai-spring-boot-starter &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>-->
+<!--            <version>1.0.0-M6</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-annotations &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-mcp-annotations</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-zhipuai</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server-webmvc &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-anthropic &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-anthropic</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-milvus-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-milvus-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-vertex-ai-gemini &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-vertex-ai-gemini</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-bedrock &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-bedrock</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-rag &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-rag</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-minimax &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-minimax</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-redis-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-redis-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-opensearch-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-opensearch-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mistral-ai &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-mistral-ai</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-autoconfigure-model-image-observation &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-autoconfigure-model-image-observation</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-qdrant-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-qdrant-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-test &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-test</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-qianfan &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-qianfan</artifactId>-->
+<!--            <version>1.0.0-M7</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-moonshot &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-moonshot</artifactId>-->
+<!--            <version>1.0.0-M7</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-tika-document-reader</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-pdf-document-reader</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-weaviate-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-weaviate-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-neo4j-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-neo4j-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-chroma-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-chroma-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-huggingface &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-huggingface</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-deepseek &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-deepseek</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-vertex-ai-embedding &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-vertex-ai-embedding</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mongodb-atlas-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-mongodb-atlas-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-typesense-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-typesense-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-google-genai &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-google-genai</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-postgresml &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-postgresml</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-mcp-client</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-advisors-vector-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-stability-ai &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-stability-ai</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pinecone-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-pinecone-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pgvector-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-pgvector-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-oracle-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-oracle-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-oci-genai &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-oci-genai</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mariadb-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-mariadb-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-hanadb-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-hanadb-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-gemfire-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-gemfire-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-cassandra-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-cassandra-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-bedrock-converse &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-bedrock-converse</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-azure-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-azure-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-watsonx-ai &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-watsonx-ai</artifactId>-->
+<!--            <version>1.0.0-M8</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-autoconfigure-mcp-server-common &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-autoconfigure-mcp-server-common</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-autoconfigure-mcp-server &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-autoconfigure-mcp-server</artifactId>-->
+<!--            <version>1.0.3</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-testcontainers &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-spring-boot-testcontainers</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-elevenlabs &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-elevenlabs</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-redis &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-redis</artifactId>-->
+<!--            <version>0.8.1</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-qdrant &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-qdrant</artifactId>-->
+<!--            <version>0.8.1</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pinecone &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-pinecone</artifactId>-->
+<!--            <version>0.8.1</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-model-chat-memory-repository-jdbc &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-model-chat-memory-repository-jdbc</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-openai-sdk &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-openai-sdk</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-markdown-document-reader</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-bedrock-knowledgebase-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-bedrock-knowledgebase-store</artifactId>-->
+<!--            <version>2.0.0-M2</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-azure-vector-store &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-azure-vector-store</artifactId>-->
+<!--            <version>0.8.1</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+    </dependencies>
+
+
+
+
+</project>
