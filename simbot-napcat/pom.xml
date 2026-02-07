@@ -17,41 +17,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-model</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.miko</groupId>
             <artifactId>simbot-bot-api</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.miko</groupId>
-            <artifactId>simbot-ai-core</artifactId>
-        </dependency>
-        <!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-spring-boot-autoconfigure</artifactId>-->
-<!--            <version>1.0.0-M6</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
-        <!-- Spring AI MCP Server 核心依赖 -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-starter-mcp-server</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>-->
-<!--        </dependency>-->
 
     </dependencies>
 
