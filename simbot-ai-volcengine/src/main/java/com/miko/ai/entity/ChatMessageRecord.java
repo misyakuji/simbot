@@ -11,12 +11,52 @@ import org.springframework.ai.chat.messages.MessageType;
 @Data
 @AllArgsConstructor
 public class ChatMessageRecord {
-    // 消息角色：user/assistant/system
+
+    // 消息角色：user / assistant / system / tool
     private String role;
+
     // 消息内容
     private String content;
 
-    // 快速构建方法
+    /* ================= 语义判断方法 ================= */
+
+    public boolean isUser() {
+        return "user".equals(role);
+    }
+
+    public boolean isAssistant() {
+        return "assistant".equals(role);
+    }
+
+    public boolean isSystem() {
+        return "system".equals(role);
+    }
+
+    public boolean isTool() {
+        return "tool".equals(role);
+    }
+
+    /* ================= 工厂方法 ================= */
+
+    public static ChatMessageRecord user(String content) {
+        return new ChatMessageRecord("user", content);
+    }
+
+    public static ChatMessageRecord assistant(String content) {
+        return new ChatMessageRecord("assistant", content);
+    }
+
+    public static ChatMessageRecord system(String content) {
+        return new ChatMessageRecord("system", content);
+    }
+
+    public static ChatMessageRecord tool(String content) {
+        return new ChatMessageRecord("tool", content);
+    }
+
+    /**
+     * 从 Spring AI Message 转为上下文记录
+     */
     public static ChatMessageRecord fromAiMessage(Message message) {
         String role = convertTypeToRole(message.getMessageType());
         String content = message.getText();
@@ -24,7 +64,7 @@ public class ChatMessageRecord {
     }
 
     /**
-     * MessageType 映射为火山方舟API要求的角色字符串
+     * MessageType -> role 映射
      */
     private static String convertTypeToRole(MessageType type) {
         return switch (type) {
@@ -32,7 +72,7 @@ public class ChatMessageRecord {
             case ASSISTANT -> "assistant";
             case SYSTEM -> "system";
             case TOOL -> "tool";
-            default -> "user"; // 兜底默认值
+            default -> "user";
         };
     }
 }
