@@ -17,13 +17,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-        <!-- 机器人API核心依赖 -->
-        <dependency>
-            <groupId>com.miko</groupId>
-            <artifactId>simbot-bot-api</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- Spring上下文支持 -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -36,7 +29,7 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
-        <!-- SLF4J 核心API，解决编译找不到包的问题 -->
+        <!-- SLF4J解决编译找不到包的问题 -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
