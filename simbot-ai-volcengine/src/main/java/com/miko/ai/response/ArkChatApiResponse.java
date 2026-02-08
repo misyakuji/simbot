@@ -9,17 +9,12 @@ import java.util.List;
  * 该类提供了一个数据结构来存储和管理从Ark聊天API返回的响应信息
  */
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * 火山方舟聊天响应实体类，适配标准tool_calls协议 - Chat API 响应
  */
 @Data
-@Component
-public class ArkChatResponse {
+public class ArkChatApiResponse {
     /**
      * 响应ID，唯一标识一次聊天请求
      */
