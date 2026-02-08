@@ -8,12 +8,19 @@ spring:
       # 火山方舟模型配置（控制台复制的模型名）
       chat:
         options:
-#          model: deepseek-v3-1-terminus
-          model: doubao-seed-1-8-251228
-#          model: doubao-seed-1-6-lite-251015
+          model: doubao-seed-1-6-flash-250828
           max-tokens: 8192
           temperature: 0.7
     ark:
       api:
         chat-api: /chat/completions
         responses-api: /responses
+      models:
+        - doubao-seed-1-6-flash-250828
+        - deepseek-v3-2-251201
+        - doubao-seed-code-preview-251028
+        - doubao-seed-1-6-lite-251015
+        - doubao-seed-translation-250915
+        - doubao-seed-1-6-vision-250815
+        - deepseek-v3-1-terminus
+        - kimi-k2-thinking-251104
