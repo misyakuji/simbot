@@ -3,7 +3,7 @@ package com.miko.ai.strategy.impl;
 import com.miko.ai.constant.ArkChatConstants;
 import com.miko.ai.converter.ArkMessageConverter;
 import com.miko.ai.enums.ArkApiMode;
-import com.miko.ai.response.ArkChatResponse;
+import com.miko.ai.response.ArkChatApiResponse;
 import com.miko.ai.strategy.ArkApiStrategy;
 import com.miko.ai.util.ArkSchemaBuilder;
 import com.miko.tool.BotToolExecutor;
@@ -26,7 +26,16 @@ import java.util.Map;
 
 /**
  * 火山方舟Chat API策略实现类，负责处理与火山引擎Ark模型的聊天交互。
- * 支持工具调用、消息转换、异步请求等功能。
+ * <p>
+ * 主要功能包括：
+ * - 工具调用：支持注册并执行自定义工具
+ * - 消息转换：将Spring AI Prompt转换为Ark兼容格式
+ * - 异步请求：基于Reactor实现非阻塞调用
+ * <p>
+ * 注意事项：
+ * - 使用工具调用需预先注册工具并实现执行逻辑
+ * - 默认采用BoundedElastic线程池处理耗时操作，防止阻塞事件循环
+ * - ChatApi接口需手动维护上下文历史，ResponsesApi接口自动处理上下文
  */
 @RequiredArgsConstructor
 public class ChatApiStrategy implements ArkApiStrategy {
@@ -59,24 +68,11 @@ public class ChatApiStrategy implements ArkApiStrategy {
     private Mono<ChatResponse> reactiveCall(Prompt prompt) {
         // 将Spring AI的Prompt转换为火山引擎Ark兼容的消息格式
         List<Map<String, String>> arkMessages = ArkMessageConverter.convertToArkMessages(prompt);
-
-        // 构建工具Schema，用于支持工具调用功能
-        List<Map<String, Object>> toolsJson = botToolRegistry.getAllTools().stream()
-                .map(meta -> Map.of(
-                        "type", "function",
-                        "function", Map.of(
-                                "name", meta.name(),
-                                "description", meta.description(),
-                                "parameters", ArkSchemaBuilder.buildJsonSchema(meta)
-                        )
-                ))
-                .toList();
-
         // 构建请求体
         Map<String, Object> requestBody = Map.of(
                 "model", model,
                 "messages", arkMessages,
-                "tools", toolsJson
+                "tools", toolsJson()
         );
 
         // 发起POST请求到火山引擎Ark API
@@ -84,7 +80,7 @@ public class ChatApiStrategy implements ArkApiStrategy {
                 .uri(baseUrl + ArkApiMode.CHAT_API.getValue())
                 .bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(ArkChatResponse.class)
+                .bodyToMono(ArkChatApiResponse.class)
                 // 异步解析响应结果,这里使用subscribeOn避免阻塞线程
                 .flatMap(arkResponse ->
                         /*
@@ -120,16 +116,40 @@ public class ChatApiStrategy implements ArkApiStrategy {
     }
 
     /**
+     * 构建工具Schema，用于支持工具调用功能。
+     * <p>
+     * 此方法将注册的所有工具元数据转换为火山引擎Ark API所需的JSON Schema格式。
+     * 每个工具包含以下信息：
+     * - type: 固定为"function"
+     * - function: 包含工具名称、描述和参数Schema
+     *
+     * @return 工具Schema列表，每个元素是一个包含工具信息的Map
+     */
+    private List<Map<String, Object>> toolsJson() {
+        // 构建工具Schema，用于支持工具调用功能
+        return botToolRegistry.getAllTools().stream()
+                .map(meta -> Map.of(
+                        "type", "function",
+                        "function", Map.of(
+                                "name", meta.name(),
+                                "description", meta.description(),
+                                "parameters", ArkSchemaBuilder.buildJsonSchema(meta)
+                        )
+                ))
+                .toList();
+    }
+
+    /**
      * 解析火山引擎Ark的响应结果，处理工具调用或普通消息。
      *
      * @param arkResponse 火山引擎Ark的原始响应
      * @return 格式化后的聊天响应
      */
-    private ChatResponse parseResponse(ArkChatResponse arkResponse) {
+    private ChatResponse parseResponse(ArkChatApiResponse arkResponse) {
         // 获取第一个选择项（通常只有一个）
-        ArkChatResponse.Choice firstChoice = arkResponse.getChoices().getFirst();
+        ArkChatApiResponse.Choice firstChoice = arkResponse.getChoices().getFirst();
         // 提取消息内容
-        ArkChatResponse.Message message = firstChoice.getMessage();
+        ArkChatApiResponse.Message message = firstChoice.getMessage();
         // 初始化消息变量
         AssistantMessage assistantMessage;
         // 判断是否存在工具调用
@@ -156,7 +176,7 @@ public class ChatApiStrategy implements ArkApiStrategy {
      * @param message 包含工具调用信息的消息对象
      * @return 包含工具执行结果的助理消息
      */
-    private AssistantMessage handleToolCalls(ArkChatResponse.Message message) {
+    private AssistantMessage handleToolCalls(ArkChatApiResponse.Message message) {
         List<AssistantMessage.ToolCall> toolCalls = new ArrayList<>();
         List<Map<String, Object>> results = new ArrayList<>();
         // 遍历所有工具调用
