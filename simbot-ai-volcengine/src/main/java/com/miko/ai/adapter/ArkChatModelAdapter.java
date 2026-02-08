@@ -25,7 +25,6 @@ public class ArkChatModelAdapter implements ChatModel {
      * 策略实例，用于处理具体的API调用逻辑
      */
     private final ArkApiStrategy strategy;
-
     /**
      * 构造函数，初始化适配器所需的组件
      *
@@ -40,7 +39,7 @@ public class ArkChatModelAdapter implements ChatModel {
             @Value("${spring.ai.openai.api-key}") String apiKey,
             @Value("${spring.ai.openai.base-url}") String baseUrl,
             @Value("${spring.ai.openai.chat.options.model}") String model,
-            @Value("${spring.ai.ark.api.chat-api}") String apiModeStr,
+            @Value("${spring.ai.ark.api.responses-api}") String apiModeStr,
             com.miko.tool.BotToolRegistry botToolRegistry,
             com.miko.tool.BotToolExecutor botToolExecutor) {
         // 初始化WebClient，设置认证头
