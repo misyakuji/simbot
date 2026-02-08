@@ -17,7 +17,6 @@ import java.util.Map;
  */
 public class ArkApiStrategyFactory {
     private final Map<ArkApiMode, ArkApiStrategy> strategyMap = new HashMap<>();
-
     /**
      * 构造函数，初始化所有可用的API策略。
      *
@@ -32,7 +31,7 @@ public class ArkApiStrategyFactory {
         // 注册聊天API策略
         strategyMap.put(ArkApiMode.CHAT_API, new ChatApiStrategy(webClient, baseUrl, model, registry, executor));
         // 注册响应API策略
-        strategyMap.put(ArkApiMode.RESPONSES_API, new ResponsesApiStrategy());
+        strategyMap.put(ArkApiMode.RESPONSES_API, new ResponsesApiStrategy(webClient,baseUrl,model,registry,executor));
     }
 
     /**
