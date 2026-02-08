@@ -3,6 +3,7 @@ package com.miko.ai.converter;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.prompt.Prompt;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,4 +70,50 @@ public class ArkMessageConverter {
             list.add(Map.of("role", role, "content", message.getText()));
         }
     }
+
+    /**
+     * 将 Spring AI 的 Prompt 对象转换为官方 Responses API 的 input 格式：
+     * [
+     *   {"role": "system", "content": "系统消息"},
+     *   {"role": "user", "content": "用户消息"}
+     * ]
+     *
+     * @param prompt Spring AI Prompt 对象
+     * @return List<Map<String,Object>> 符合 Responses API 的 input
+     */
+    public static List<Map<String, Object>> convertToResponsesInput(Prompt prompt) {
+        List<Map<String, Object>> inputList = new ArrayList<>();
+        if (prompt == null) return inputList;
+
+        // 系统消息
+        prompt.getSystemMessages().forEach(sysMsg -> addMessage(inputList, "system", sysMsg));
+
+        // 用户消息
+        prompt.getUserMessages().forEach(userMsg -> addMessage(inputList, "user", userMsg));
+
+        // 最后一条用户或工具消息
+        Message lastMsg = prompt.getLastUserOrToolResponseMessage();
+        if (lastMsg.getText() != null) {
+            addMessage(inputList, lastMsg.getMessageType().getValue(), lastMsg);
+        }
+
+        return inputList;
+    }
+
+    /**
+     * 通用方法：将单条消息转换为 {"role":"xxx","content":"..."} 格式并加入列表
+     *
+     * @param list    目标列表
+     * @param role    消息角色（system/user/assistant）
+     * @param message Spring AI 消息对象
+     */
+    private static void addMessage(List<Map<String, Object>> list, String role, Message message) {
+        if (message != null && message.getText() != null && !message.getText().isEmpty()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("role", role);
+            map.put("content", message.getText());
+            list.add(map);
+        }
+    }
+
 }
