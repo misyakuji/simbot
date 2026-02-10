@@ -18,10 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
  * 提供多种QQ群消息发送功能，包括文本消息、@消息、图片消息等。
  * 支持通过BotTool注解定义可调用的工具方法，便于集成到AI模型中使用。
  * </p>
- *
- * @author YourName
- * @version 1.0
- * @since 2025-04-07
  */
 @Slf4j
 @Component
