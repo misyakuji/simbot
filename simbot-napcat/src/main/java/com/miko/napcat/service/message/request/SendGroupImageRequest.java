@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 发送群组图片请求类
  * 用于构建发送到指定群组的图片消息请求
@@ -14,7 +17,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class SendGroupImageRequest {
+public class SendGroupImageRequest implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     /**
      * 目标群号
      * 用于指定消息发送的目标群组
@@ -71,6 +76,7 @@ public class SendGroupImageRequest {
 
         /**
          * 构造函数
+         *
          * @param file 本地图片文件路径
          */
         public ImageData(String file) {
