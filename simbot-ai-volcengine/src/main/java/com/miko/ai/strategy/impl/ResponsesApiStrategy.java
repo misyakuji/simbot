@@ -178,7 +178,20 @@ public class ResponsesApiStrategy implements ArkApiStrategy {
             return continueAfterTool(toolInput);
         }
         // 获取第二个消息作为最终回复（第一个通常是用户输入）
-        ArkResponsesApiResponse.Message msg = resp.getOutput().get(1);
+        ArkResponsesApiResponse.Message msg;
+
+        // 如果有两条或以上消息，取第二条；否则取第一条
+        if (messages.size() > 1) {
+            msg = messages.get(1);
+        } else if (messages.size() == 1) {
+            msg = messages.getFirst();
+        } else {
+            // 没有任何消息，返回空回复
+            return ChatResponse.builder()
+                    .generations(List.of(new Generation(new AssistantMessage(""))))
+                    .metadata("model", model)
+                    .build();
+        }
         // 不执行工具则正常文本回复
         String text = msg.getContent().getFirst().getText();
         // 构建并返回最终的聊天响应
