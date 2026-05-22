@@ -95,7 +95,7 @@
 
             <dependency>
                 <groupId>com.miko</groupId>
-                <artifactId>simbot-stater</artifactId>
+                <artifactId>simbot-starter</artifactId>
                 <version>${miko.version}</version>
             </dependency>
 

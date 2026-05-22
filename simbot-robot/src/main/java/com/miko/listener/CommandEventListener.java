@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
 public class CommandEventListener {
 
     private final VolcArkConfig volcArkConfig;
-    private final MessageEventListener messageEventListener;
+    private final Map<String, BotChatContext> chatContexts;
     private final NapCatApiService napCatApiService;
     private final BotContactService botContactService;
     private final ArkDoubaoService arkDoubaoService;
@@ -195,9 +195,6 @@ public class CommandEventListener {
     @Filter(value = "^/chatList", matchType = MatchType.REGEX_MATCHES)
     public void chatListCmdEvent(OneBotFriendMessageEvent event) {
         try {
-            // 获取对话上下文
-            Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
-
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
                 volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
@@ -256,9 +253,6 @@ public class CommandEventListener {
         }
 
         try {
-            // 获取对话上下文
-            Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
-
             if (chatContexts.isEmpty()) {
                 event.getContent().sendAsync("📋 当前没有正在进行的对话");
                 volcArkConfig.getInterruptFlag().put(event.getId().toString(), Boolean.TRUE);
@@ -280,7 +274,7 @@ public class CommandEventListener {
             BotChatContext removedContext = entryToRemove.getValue();
 
             // 从上下文Map中删除
-            removeChatContextFromMessageEventListener(removedKey);
+            chatContexts.remove(removedKey);
 
             String successMsg = String.format("✅ 成功删除对话！\n对话ID：%s\n聊天类型：%s\n聊天ID：%s",
                     removedKey, removedContext.getChatType(), removedContext.getChatId());
@@ -419,16 +413,4 @@ public class CommandEventListener {
         }
     }
 
-    // 反射获取MessageEventListener中的chatContexts
-    private Map<String, BotChatContext> getChatContextsFromMessageEventListener() throws Exception {
-        java.lang.reflect.Field field = MessageEventListener.class.getDeclaredField("chatContexts");
-        field.setAccessible(true);
-        return (Map<String, BotChatContext>) field.get(messageEventListener);
-    }
-
-    // 反射从MessageEventListener中删除指定的chatContext
-    private void removeChatContextFromMessageEventListener(String key) throws Exception {
-        Map<String, BotChatContext> chatContexts = getChatContextsFromMessageEventListener();
-        chatContexts.remove(key);
-    }
 }

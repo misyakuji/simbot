@@ -88,11 +88,11 @@ public class MessageEventListener {
         String msgfix = OneBotMessageUtil.fixMessage(event);
 
         // 获取该群的对话上下文，如果不存在则创建新的
-        String referenceKey = BotChatContext.ChatType.PRIVATE + groupId;
+        String referenceKey = BotChatContext.ChatType.GROUP + groupId;
         BotChatContext botChatContext = chatContexts.computeIfAbsent(referenceKey, k ->
                 BotChatContext.builder()
                         .chatId(groupId)
-                        .chatType(BotChatContext.ChatType.PRIVATE)
+                        .chatType(BotChatContext.ChatType.GROUP)
                         .build()
         );
         // 调用连续对话方法
