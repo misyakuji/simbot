@@ -44,3 +44,4 @@ device.json
 **/simbot-bots/
 **/*.log
 info.log.**.gz
+.deepseek
