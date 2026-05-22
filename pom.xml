@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.2</version>
+        <version>4.0.6</version>
         <relativePath/>
     </parent>
 
@@ -32,22 +32,21 @@
 
         <miko.version>1.0</miko.version>
         <mybatis.version>4.0.1</mybatis.version>
-        <mybatis.plus.version>3.5.15</mybatis.plus.version>
-        <sqlite.version>3.51.1.0</sqlite.version>
-        <druid.version>1.2.27</druid.version>
-        <jsoup.version>1.22.1</jsoup.version>
-        <httpclient.version>5.6</httpclient.version>
-        <httputil.version>0.9.6</httputil.version>
-        <fastjson.version>2.0.33</fastjson.version>
-        <snakeyaml.version>2.5</snakeyaml.version>
-        <simbot.version>5.0.0-Preview1</simbot.version>
-        <onebot.version>5.0.0-Preview1</onebot.version>
-        <ktor.version>2.3.13</ktor.version>
-        <jsch.version>2.27.7</jsch.version>
+        <mybatis.plus.version>3.5.16</mybatis.plus.version>
+        <sqlite.version>3.53.1.0</sqlite.version>
+        <druid.version>1.2.28</druid.version>
+        <jsoup.version>1.22.2</jsoup.version>
+        <httpclient.version>5.6.1</httpclient.version>
+        <httputil.version>0.9.7</httputil.version>
+        <fastjson.version>2.0.62</fastjson.version>
+        <snakeyaml.version>2.6</snakeyaml.version>
+        <simple-robot.version>5.0.0-Preview2</simple-robot.version>
+        <ktor.version>3.3.3</ktor.version>
+        <jsch.version>2.28.2</jsch.version>
         <jasypt.version>4.0.4</jasypt.version>
 
         <!-- volcengine-java-sdk-ark-runtime -->
-        <volcengine-java-sdk-ark-runtime.version>1.0.7</volcengine-java-sdk-ark-runtime.version>
+        <volcengine-java-sdk-ark-runtime.version>2.0.4</volcengine-java-sdk-ark-runtime.version>
         <jackson.version>2.12.7.1</jackson.version>
         <retrofit.version>2.9.0</retrofit.version>
         <rxjava2.version>2.0.0</rxjava2.version>
@@ -105,15 +104,16 @@
                 <version>${miko.version}</version>
             </dependency>
 
+            <!-- https://docs.spring.io/spring-ai/reference/2.0/getting-started.html -->
             <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
-                <version>2.0.0-M2</version>
+                <version>2.0.0-M6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
-            <!-- Mybatis -->
+            <!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
@@ -126,7 +126,8 @@
                 <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
-            <!-- 阿里数据库连接池包 -->
+
+            <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
@@ -140,20 +141,21 @@
                 <version>${jasypt.version}</version>
             </dependency>
 
-            <!-- 解析YAML -->
+            <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
             </dependency>
 
-            <!--FastJson2-->
+            <!--https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2-->
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
@@ -167,7 +169,7 @@
                 <version>${httpclient.version}</version>
             </dependency>
 
-            <!-- OKHttpUtil -->
+            <!-- https://mvnrepository.com/artifact/io.github.admin4j/common-http-starter -->
             <dependency>
                 <groupId>io.github.admin4j</groupId>
                 <artifactId>common-http-starter</artifactId>
@@ -181,26 +183,28 @@
                 <version>${okhttp3.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
             <dependency>
                 <groupId>org.xerial</groupId>
                 <artifactId>sqlite-jdbc</artifactId>
                 <version>${sqlite.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/love.forte.simbot/simbot-core-spring-boot-starter -->
             <dependency>
                 <groupId>love.forte.simbot</groupId>
                 <artifactId>simbot-core-spring-boot-starter</artifactId>
-                <version>${simbot.version}</version>
+                <version>${simple-robot.version}</version>
             </dependency>
             <dependency>
                 <groupId>love.forte.simbot</groupId>
                 <artifactId>simbot-core-jvm</artifactId>
-                <version>${simbot.version}</version>
+                <version>${simple-robot.version}</version>
             </dependency>
             <dependency>
                 <groupId>love.forte.simbot.component</groupId>
                 <artifactId>simbot-component-onebot-v11-core-jvm</artifactId>
-                <version>${onebot.version}</version>
+                <version>${simple-robot.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/io.ktor/ktor-client-java-jvm -->
             <dependency>
@@ -217,11 +221,14 @@
                 <version>${volcengine-java-sdk-ark-runtime.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.github.mwiede/jsch -->
             <dependency>
                 <groupId>com.github.mwiede</groupId>
                 <artifactId>jsch</artifactId>
