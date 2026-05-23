@@ -1,7 +1,5 @@
 package com.miko.listener;
 
-
-import com.miko.config.VolcArkConfig;
 import com.miko.entity.BotChatContact;
 import com.miko.entity.BotChatContext;
 import com.miko.service.ArkDoubaoService;
@@ -27,10 +25,10 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class MessageEventListener {
-    private final VolcArkConfig volcArkConfig;
 
     private final ArkDoubaoService arkDoubaoService;
     private final BotContactService botContactService;
+    private final CommandEventHandler cmdHandler;
 
     /**
      * 注入全局 对话上下文: key = 对话类型+群聊ID/好友ID+对话ID value = 该对话的上下文
@@ -46,11 +44,6 @@ public class MessageEventListener {
     @Listener
     @ContentTrim
     public void groupMsgEvent(OneBotGroupMessageEvent event) {
-        // 检查是否被标记中断，是则直接返回（不执行后续逻辑）
-        if (Boolean.TRUE.equals(volcArkConfig.getInterruptFlag().get(event.getMessageId()))) {
-            volcArkConfig.getInterruptFlag().remove(event.getMessageId()); // 清理标记，避免内存泄漏
-            return;
-        }
         // 群昵称
         String groupNickname = event.getContent().getName();
         // 群ID
@@ -72,11 +65,6 @@ public class MessageEventListener {
     @ContentTrim
     @Filter(targets = @Filter.Targets(atBot = true))
     public void groupMsgEventByAt(OneBotGroupMessageEvent event) {
-        // 检查是否被标记中断，是则直接返回（不执行后续逻辑）
-        if (Boolean.TRUE.equals(volcArkConfig.getInterruptFlag().get(event.getMessageId()))) {
-            volcArkConfig.getInterruptFlag().remove(event.getMessageId()); // 清理标记，避免内存泄漏
-            return;
-        }
         if (Objects.requireNonNull(event.getMessageContent().getPlainText()).startsWith("/")) {
             return;
         }
@@ -89,7 +77,7 @@ public class MessageEventListener {
 
         // 获取该群的对话上下文，如果不存在则创建新的
         String referenceKey = BotChatContext.ChatType.GROUP + groupId;
-        BotChatContext botChatContext = chatContexts.computeIfAbsent(referenceKey, k ->
+        BotChatContext botChatContext = chatContexts.computeIfAbsent(referenceKey, _ ->
                 BotChatContext.builder()
                         .chatId(groupId)
                         .chatType(BotChatContext.ChatType.GROUP)
@@ -104,13 +92,18 @@ public class MessageEventListener {
 
     @Listener(priority = PriorityConstant.DE_PRIORITIZE_1)
     public void friendMsgEvent(OneBotFriendMessageEvent event) {
-        // 标记检查
-        if (markingInspection(event)) return;
-        // 好友ID
+        //消息内容
+        String text = Objects.requireNonNull(event.getMessageContent().getPlainText()).trim();
+        // 处理以/开头的指令
+        if (text.startsWith("/")) {
+            cmdHandler.handle(text, event);
+            return;
+        }
+
         String friendId = event.getAuthorId().toString();
         // 好友昵称
         String friendNickname = event.getSourceEvent().getSender().getNickname();
-        // 消息内容
+        // 提取消息
         String msgFix = OneBotMessageUtil.fixMessage(event);
         log.info("接收 <- 私聊 [{}({})] {}", friendNickname, friendId, msgFix);
 
@@ -126,7 +119,7 @@ public class MessageEventListener {
 
         // 7️⃣ 调用 AI 处理聊天
         String referenceKey = BotChatContext.ChatType.PRIVATE + friendId;
-        BotChatContext botChatContext = chatContexts.computeIfAbsent(referenceKey, k ->
+        BotChatContext botChatContext = chatContexts.computeIfAbsent(referenceKey, _ ->
                 BotChatContext.builder()
                         .chatId(friendId)
                         .chatType(BotChatContext.ChatType.PRIVATE)
@@ -136,21 +129,6 @@ public class MessageEventListener {
         String reply = arkDoubaoService.multiChatWithDoubao(msgFix, botChatContext);
         log.info("发送 -> {} - {}", event.getId(), reply);
         event.replyAsync(reply);
-
     }
 
-    /**
-     * 标记检查
-     *
-     * @param event OneBotFriendMessageEvent
-     * @return boolean
-     */
-    private boolean markingInspection(OneBotFriendMessageEvent event) {
-        // 检查是否被标记中断，是则直接返回（不执行后续逻辑）
-        if (Boolean.TRUE.equals(volcArkConfig.getInterruptFlag().get(event.getId()))) {
-            volcArkConfig.getInterruptFlag().remove(event.getId()); // 清理标记，避免内存泄漏
-            return true;
-        }
-        return Objects.requireNonNull(event.getMessageContent().getPlainText()).startsWith("/");
-    }
 }

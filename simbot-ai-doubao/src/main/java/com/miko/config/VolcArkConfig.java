@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 火山方舟 ArkService 配置类
@@ -21,8 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @ConfigurationProperties(prefix = "volc.ark")
 public class VolcArkConfig {
 
-    // 全局线程安全标记：key=事件唯一ID，value=是否中断后续监听
-    private final ConcurrentHashMap<String, Boolean> interruptFlag = new ConcurrentHashMap<>();
     private String apiKey;
     private String baseUrl;
     private ArkService arkService;

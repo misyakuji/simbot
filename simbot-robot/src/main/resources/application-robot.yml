@@ -21,12 +21,3 @@ simbot:
     auto-install-providers: true
     auto-install-provider-configures: true
 
-# application.yml
-spring:
-  ai:
-    deepseek:
-      api-key: ${DEEPSEEK_API_KEY}
-      chat:
-        options:
-          model: deepseek-chat
-          temperature: 0.8
