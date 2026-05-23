@@ -51,7 +51,7 @@ public class FavorabilityEngine {
         // ===============================
         // 情绪只允许影响 -1 ~ +1
         // 防止情绪值过大导致好感度异常波动
-        int moodImpact = Math.max(-1, Math.min(1, ctx.getCurrentMood()));
+        int moodImpact = Math.clamp(ctx.getCurrentMood(), -1, 1);
         delta += moodImpact;
 
         // ===============================
@@ -111,10 +111,8 @@ public class FavorabilityEngine {
         int moodDelta = Integer.compare(delta, 0);
 
         // 情绪范围限制在 -3 ~ +3
-        int newMood = Math.max(
-                -3,
-                Math.min(3, ctx.getCurrentMood() + moodDelta)
-        );
+        int newMood = Math.clamp(ctx.getCurrentMood() + moodDelta,
+                -3, 3);
 
         // ===============================
         // 构建结果对象

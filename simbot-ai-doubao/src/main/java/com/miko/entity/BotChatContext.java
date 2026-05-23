@@ -38,7 +38,7 @@ public class BotChatContext {
         this.currentModel = null;
 
         // 可选：打印日志（方便调试，生产环境可注释）
-        String chatIdStr = this.chatId == null ? "未知" : this.chatId.toString();
+        String chatIdStr = this.chatId == null ? "未知" : this.chatId;
         System.out.println("会话[" + chatIdStr + "]的上下文已清空");
     }
 
