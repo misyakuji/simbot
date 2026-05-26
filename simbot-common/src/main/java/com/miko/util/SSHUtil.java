@@ -103,55 +103,6 @@ public class SSHUtil implements AutoCloseable {
                 DEFAULT_IDLE_TIMEOUT_SECONDS, connectTimeout, DEFAULT_CONNECT_RETRY_TIMES);
     }
 
-    /**
-     * 测试方法（验证cd命令上下文保持）
-     */
-    public static void main(String[] args) {
-        try {
-            // 创建SSH连接（Termux环境）
-            SSHUtil ssh = SSHUtil.createWithPassword("192.168.1.20", 8022, "u0_a369", "123456", 30000);
-            ssh.connect();
-
-            // 测试单条命令
-            System.out.println("=== 测试单条pwd命令 ===");
-            String pwdResult = ssh.executeCommand("pwd");
-            System.out.println("单条命令执行结果：\n" + pwdResult);
-
-            // 测试cd命令
-            System.out.println("\n=== 测试cd test命令 ===");
-            String cdResult = ssh.executeCommand("cd test");
-            System.out.println("单条命令执行结果：\n" + cdResult);
-
-            // 再次执行pwd验证路径
-            System.out.println("\n=== 再次执行pwd验证路径 ===");
-            String pwdResult2 = ssh.executeCommand("pwd");
-            System.out.println("单条命令执行结果：\n" + pwdResult2);
-
-            // 测试多条命令
-            System.out.println("\n=== 测试多条命令 ===");
-            String multiResult = ssh.executeCommands(
-                    "mkdir test",
-                    "cd test",
-                    "pwd",
-                    "cd ..",
-                    "pwd"
-            );
-            System.out.println("多条命令执行结果：\n" + multiResult);
-
-            // 验证空闲超时
-            log.info("等待10秒，验证空闲超时自动关闭...");
-            Thread.sleep(10000);
-
-            // 超时后执行命令
-            System.out.println("\n=== 超时后执行pwd ===");
-            String pwdResult3 = ssh.executeCommand("pwd");
-            System.out.println("执行结果：\n" + pwdResult3);
-
-            ssh.disconnect();
-        } catch (Exception e) {
-            log.error("测试失败", e);
-        }
-    }
 
     /**
      * 建立SSH连接（创建Shell通道）

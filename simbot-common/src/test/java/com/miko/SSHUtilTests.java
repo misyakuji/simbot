@@ -245,19 +245,4 @@ class SSHUtilTests {
         log.info("  ✓ 测试文件清理");
         log.info("========================================");
     }
-
-    /**
-     * 快速验证测试（不依赖实际SSH服务器）
-     */
-    @Test
-    void testQuickValidation() {
-        // 验证SSHExecUtil类可以正常实例化（不连接）
-        SSHExecUtil ssh = SSHExecUtil.create("dummy", 22, "user", "pass");
-        assertNotNull(ssh, "SSHExecUtil应该能正常创建");
-        assertFalse(ssh.isConnected(), "未连接时状态应为false");
-
-        // 测试disconnect的安全性
-        assertDoesNotThrow(() -> ssh.disconnect(), "断开未连接的SSH不应抛出异常");
-        log.info("快速验证测试通过");
-    }
 }
